@@ -55,9 +55,11 @@
  * Matrix multiplication (CUDA Kernel) on the device: C = A * B
  * wA is A's width and wB is B's width
  */
-template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
-    float *B, int wA,
-    int wB) {
+template <int BLOCK_SIZE>
+__global__ void MatrixMulCUDA(float *C, float *A,
+                              float *B, int wA,
+                              int wB)
+{
   // Block index
   int bx = blockIdx.x;
   int by = blockIdx.y;
@@ -70,16 +72,16 @@ template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
   int aBegin = wA * BLOCK_SIZE * by;
 
   // Index of the last sub-matrix of A processed by the block
-  int aEnd   = aBegin + wA - 1;
+  int aEnd = aBegin + wA - 1;
 
   // Step size used to iterate through the sub-matrices of A
-  int aStep  = BLOCK_SIZE;
+  int aStep = BLOCK_SIZE;
 
   // Index of the first sub-matrix of B processed by the block
   int bBegin = BLOCK_SIZE * bx;
 
   // Step size used to iterate through the sub-matrices of B
-  int bStep  = BLOCK_SIZE * wB;
+  int bStep = BLOCK_SIZE * wB;
 
   // Csub is used to store the element of the block sub-matrix
   // that is computed by the thread
@@ -89,7 +91,8 @@ template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
   // required to compute the block sub-matrix
   for (int a = aBegin, b = bBegin;
        a <= aEnd;
-       a += aStep, b += bStep) {
+       a += aStep, b += bStep)
+  {
     // Declaration of the shared memory array As used to
     // store the sub-matrix of A
     __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
@@ -112,7 +115,8 @@ template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
     // of the block sub-matrix
 #pragma unroll
 
-    for (int k = 0; k < BLOCK_SIZE; ++k) {
+    for (int k = 0; k < BLOCK_SIZE; ++k)
+    {
       Csub += As[ty][k] * Bs[k][tx];
     }
 
@@ -128,8 +132,127 @@ template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
   C[c + wB * ty + tx] = Csub;
 }
 
-void ConstantInit(float *data, int size, float val) {
-  for (int i = 0; i < size; ++i) {
+// WERSJA A 2 wyniki
+// template <int BLOCK_SIZE>
+// __global__ void MatrixMulKernel_2results(float *C, float *A,
+//                                          float *B, int wA,
+//                                          int wB)
+// {
+//   int bx = blockIdx.x;
+//   int by = blockIdx.y;
+//   int tx = threadIdx.x;
+//   int ty = threadIdx.y;
+
+//   int row = by * BLOCK_SIZE + ty;
+//   int col = (bx * BLOCK_SIZE + tx) * 2; // Każdy wątek liczy 2 elementy w poziomie
+
+//   float Csub1 = 0.0f;
+//   float Csub2 = 0.0f;
+
+//   for (int m = 0; m < wA / BLOCK_SIZE; ++m)
+//   {
+//     __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+//     __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * 2]; // x2, bo każdy wątek potrzebuje 2 kolumny
+
+//     int aRow = row;
+//     int aCol = m * BLOCK_SIZE + tx;
+//     int bRow = m * BLOCK_SIZE + ty;
+//     int bCol1 = col;
+//     int bCol2 = col + 1;
+
+//     if (aRow < wA && aCol < wA)
+//       As[ty][tx] = A[aRow * wA + aCol];
+//     else
+//       As[ty][tx] = 0.0f;
+
+//     if (bRow < wA && bCol1 < wB)
+//       Bs[ty][tx * 2] = B[bRow * wB + bCol1];
+//     else
+//       Bs[ty][tx * 2] = 0.0f;
+
+//     if (bRow < wA && bCol2 < wB)
+//       Bs[ty][tx * 2 + 1] = B[bRow * wB + bCol2];
+//     else
+//       Bs[ty][tx * 2 + 1] = 0.0f;
+
+//     __syncthreads();
+// #pragma unroll
+//     for (int k = 0; k < BLOCK_SIZE; ++k)
+//     {
+//       Csub1 += As[ty][k] * Bs[k][tx * 2];
+//       Csub2 += As[ty][k] * Bs[k][tx * 2 + 1];
+//     }
+
+//     __syncthreads();
+//   }
+
+//   if (row < wA && col < wB)
+//     C[row * wB + col] = Csub1;
+//   if (row < wA && col + 1 < wB)
+//     C[row * wB + col + 1] = Csub2;
+// }
+
+
+// WERSJA B 2 wyniki
+template <int SUB_WIDTH>
+__global__ void MatrixMulKernel_2results(float *Cd, float *Ad, float *Bd,  int Width, int Height)
+{
+  __shared__ float Ads[SUB_WIDTH][SUB_WIDTH];
+  __shared__ float Bds[SUB_WIDTH][SUB_WIDTH * 2]; // Podwójna szerokość dla B
+
+  int tx = threadIdx.x;
+  int ty = threadIdx.y;
+  int Row = blockIdx.y * SUB_WIDTH + ty;
+  int Col = blockIdx.x * SUB_WIDTH * 2 + tx * 2; // 2 wyniki na wątek z właściwym przeskalowaniem bloku
+
+  float C_local0 = 0.0f;
+  float C_local1 = 0.0f;
+
+  for (int m = 0; m < Width / SUB_WIDTH; ++m)
+  {
+    // Ładowanie kafelka A
+    if (Row < Width && (m * SUB_WIDTH + tx) < Width)
+      Ads[ty][tx] = Ad[Row * Width + m * SUB_WIDTH + tx];
+    else
+      Ads[ty][tx] = 0.0f;
+
+    // Ładowanie kafelka B - każdy wątek ładuje dwa elementy
+    int baseB = m * SUB_WIDTH;
+    if (baseB + ty < Width && Col < Width)
+      Bds[ty][tx * 2] = Bd[(baseB + ty) * Width + Col];
+    else
+      Bds[ty][tx * 2] = 0.0f;
+
+    if (baseB + ty < Width && Col + 1 < Width)
+      Bds[ty][tx * 2 + 1] = Bd[(baseB + ty) * Width + Col + 1];
+    else
+      Bds[ty][tx * 2 + 1] = 0.0f;
+
+    __syncthreads();
+
+    // Obliczenia: każdy wątek oblicza dwa elementy C
+#pragma unroll
+    for (int k = 0; k < SUB_WIDTH; ++k)
+    {
+        float a = Ads[ty][k];
+        C_local0 += a * Bds[k][tx * 2];
+        C_local1 += a * Bds[k][tx * 2 + 1];
+    }
+
+    __syncthreads();
+  }
+
+  // Zapis wyników, jeśli w zakresie macierzy
+  if (Row < Width && Col < Width)
+    Cd[Row * Width + Col] = C_local0;
+  if (Row < Width && Col + 1 < Width)
+    Cd[Row * Width + Col + 1] = C_local1;
+}
+
+void ConstantInit(float *data, int size, float val)
+{
+  for (int i = 0; i < size; ++i)
+  {
     data[i] = val;
   }
 }
@@ -139,7 +262,8 @@ void ConstantInit(float *data, int size, float val) {
  */
 int MatrixMultiply(int argc, char **argv,
                    int block_size, const dim3 &dimsA,
-                   const dim3 &dimsB) {
+                   const dim3 &dimsB)
+{
   // Allocate host memory for matrices A and B
   unsigned int size_A = dimsA.x * dimsA.y;
   unsigned int mem_size_A = sizeof(float) * size_A;
@@ -165,7 +289,8 @@ int MatrixMultiply(int argc, char **argv,
   float *h_C;
   checkCudaErrors(cudaMallocHost(&h_C, mem_size_C));
 
-  if (h_C == NULL) {
+  if (h_C == NULL)
+  {
     fprintf(stderr, "Failed to allocate host matrix C!\n");
     exit(EXIT_FAILURE);
   }
@@ -188,17 +313,23 @@ int MatrixMultiply(int argc, char **argv,
 
   // Setup execution parameters
   dim3 threads(block_size, block_size);
-  dim3 grid(dimsB.x / threads.x, dimsA.y / threads.y);
-
+  dim3 grid((dimsB.x + block_size * 2 - 1) / (block_size * 2), (dimsA.y + block_size - 1) / block_size);
   // Create and start timer
   printf("Computing result using CUDA Kernel...\n");
 
   // Performs warmup operation using matrixMul CUDA kernel
-  if (block_size == 16) {
-    MatrixMulCUDA<16>
+  if (block_size == 16)
+  {
+    // MatrixMulCUDA<16>
+    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    MatrixMulKernel_2results<16>
         <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-  } else {
-    MatrixMulCUDA<32>
+  }
+  else
+  {
+    // MatrixMulCUDA<32>
+    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    MatrixMulKernel_2results<32>
         <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
 
@@ -211,13 +342,21 @@ int MatrixMultiply(int argc, char **argv,
   // Execute the kernel
   int nIter = 1;
 
-  for (int j = 0; j < nIter; j++) {
-    if (block_size == 16) {
-      MatrixMulCUDA<16>
+  for (int j = 0; j < nIter; j++)
+  {
+    if (block_size == 16)
+    {
+      // MatrixMulCUDA<16>
+      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      MatrixMulKernel_2results<16>
           <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    } else {
-      MatrixMulCUDA<32>
-          <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    }
+    else
+    {
+      // MatrixMulCUDA<32>
+      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      MatrixMulKernel_2results<32>
+          <<<grid, threads, 0, stream>>>( d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
   }
 
@@ -254,13 +393,15 @@ int MatrixMultiply(int argc, char **argv,
   //     |<x, y>_cpu - <x,y>_gpu|/<|x|, |y|>  < eps
   double eps = 1.e-4; // 1.e-6;  // machine zero
 
-  for (int i = 0; i < static_cast<int>(dimsC.x * dimsC.y); i++) {
+  for (int i = 0; i < static_cast<int>(dimsC.x * dimsC.y); i++)
+  {
     double abs_err = fabs(h_C[i] - (dimsA.x * valB));
     double dot_length = dimsA.x;
     double abs_val = fabs(h_C[i]);
     double rel_err = abs_err / abs_val / dot_length;
 
-    if (rel_err > eps) {
+    if (rel_err > eps)
+    {
       printf("Error! Matrix[%05d]=%.8f, ref=%.8f error term is > %E\n",
              i, h_C[i], dimsA.x * valB, eps);
       correct = false;
@@ -282,26 +423,30 @@ int MatrixMultiply(int argc, char **argv,
       "\nNOTE: The CUDA Samples are not meant for performance "
       "measurements. Results may vary when GPU Boost is enabled.\n");
 
-  if (correct) {
+  if (correct)
+  {
     return EXIT_SUCCESS;
-  } else {
+  }
+  else
+  {
     return EXIT_FAILURE;
   }
 }
 
-
 /**
  * Program main
  */
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   printf("[Matrix Multiply Using CUDA] - Starting...\n");
 
   if (checkCmdLineFlag(argc, (const char **)argv, "help") ||
-      checkCmdLineFlag(argc, (const char **)argv, "?")) {
+      checkCmdLineFlag(argc, (const char **)argv, "?"))
+  {
     printf("Usage -device=n (n >= 0 for deviceID)\n");
     printf("      -wA=WidthA -hA=HeightA (Width x Height of Matrix A)\n");
     printf("      -wB=WidthB -hB=HeightB (Width x Height of Matrix B)\n");
-    printf("  Note: Outer matrix dimensions of A & B matrices" \
+    printf("  Note: Outer matrix dimensions of A & B matrices"
            " must be equal.\n");
 
     exit(EXIT_SUCCESS);
@@ -317,26 +462,31 @@ int main(int argc, char **argv) {
   dim3 dimsB(50 * 2 * block_size, 50 * 2 * block_size, 1);
 
   // width of Matrix A
-  if (checkCmdLineFlag(argc, (const char **)argv, "wA")) {
+  if (checkCmdLineFlag(argc, (const char **)argv, "wA"))
+  {
     dimsA.x = getCmdLineArgumentInt(argc, (const char **)argv, "wA");
   }
 
   // height of Matrix A
-  if (checkCmdLineFlag(argc, (const char **)argv, "hA")) {
+  if (checkCmdLineFlag(argc, (const char **)argv, "hA"))
+  {
     dimsA.y = getCmdLineArgumentInt(argc, (const char **)argv, "hA");
   }
 
   // width of Matrix B
-  if (checkCmdLineFlag(argc, (const char **)argv, "wB")) {
+  if (checkCmdLineFlag(argc, (const char **)argv, "wB"))
+  {
     dimsB.x = getCmdLineArgumentInt(argc, (const char **)argv, "wB");
   }
 
   // height of Matrix B
-  if (checkCmdLineFlag(argc, (const char **)argv, "hB")) {
+  if (checkCmdLineFlag(argc, (const char **)argv, "hB"))
+  {
     dimsB.y = getCmdLineArgumentInt(argc, (const char **)argv, "hB");
   }
 
-  if (dimsA.x != dimsB.y) {
+  if (dimsA.x != dimsB.y)
+  {
     printf("Error: outer matrix dimensions must be equal. (%d != %d)\n",
            dimsA.x, dimsB.y);
     exit(EXIT_FAILURE);
@@ -348,6 +498,7 @@ int main(int argc, char **argv) {
   checkCudaErrors(cudaProfilerStart());
   int matrix_result = MatrixMultiply(argc, argv, block_size, dimsA, dimsB);
   checkCudaErrors(cudaProfilerStop());
+  checkCudaErrors(cudaDeviceSynchronize());
 
   exit(matrix_result);
 }
