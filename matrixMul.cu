@@ -132,121 +132,104 @@ __global__ void MatrixMulCUDA(float *C, float *A,
   C[c + wB * ty + tx] = Csub;
 }
 
-// WERSJA A 2 wyniki
-// template <int BLOCK_SIZE>
-// __global__ void MatrixMulKernel_2results(float *C, float *A,
-//                                          float *B, int wA,
-//                                          int wB)
-// {
-//   int bx = blockIdx.x;
-//   int by = blockIdx.y;
-//   int tx = threadIdx.x;
-//   int ty = threadIdx.y;
-
-//   int row = by * BLOCK_SIZE + ty;
-//   int col = (bx * BLOCK_SIZE + tx) * 2; // Każdy wątek liczy 2 elementy w poziomie
-
-//   float Csub1 = 0.0f;
-//   float Csub2 = 0.0f;
-
-//   for (int m = 0; m < wA / BLOCK_SIZE; ++m)
-//   {
-//     __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-//     __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * 2]; // x2, bo każdy wątek potrzebuje 2 kolumny
-
-//     int aRow = row;
-//     int aCol = m * BLOCK_SIZE + tx;
-//     int bRow = m * BLOCK_SIZE + ty;
-//     int bCol1 = col;
-//     int bCol2 = col + 1;
-
-//     if (aRow < wA && aCol < wA)
-//       As[ty][tx] = A[aRow * wA + aCol];
-//     else
-//       As[ty][tx] = 0.0f;
-
-//     if (bRow < wA && bCol1 < wB)
-//       Bs[ty][tx * 2] = B[bRow * wB + bCol1];
-//     else
-//       Bs[ty][tx * 2] = 0.0f;
-
-//     if (bRow < wA && bCol2 < wB)
-//       Bs[ty][tx * 2 + 1] = B[bRow * wB + bCol2];
-//     else
-//       Bs[ty][tx * 2 + 1] = 0.0f;
-
-//     __syncthreads();
-// #pragma unroll
-//     for (int k = 0; k < BLOCK_SIZE; ++k)
-//     {
-//       Csub1 += As[ty][k] * Bs[k][tx * 2];
-//       Csub2 += As[ty][k] * Bs[k][tx * 2 + 1];
-//     }
-
-//     __syncthreads();
-//   }
-
-//   if (row < wA && col < wB)
-//     C[row * wB + col] = Csub1;
-//   if (row < wA && col + 1 < wB)
-//     C[row * wB + col + 1] = Csub2;
-// }
-
-
-// WERSJA B 2 wyniki
-template <int SUB_WIDTH>
-__global__ void MatrixMulKernel_2results(float *Cd, float *Ad, float *Bd,  int Width, int Height)
+// WERSJA  1 wynik
+template <int BLOCK_SIZE>
+__global__ void MatrixMulKernel_1results(float *C, float *A,
+                                         float *B, int wA,
+                                         int wB)
 {
-  __shared__ float Ads[SUB_WIDTH][SUB_WIDTH];
-  __shared__ float Bds[SUB_WIDTH][SUB_WIDTH * 2]; // Podwójna szerokość dla B
-
+  int bx = blockIdx.x;
+  int by = blockIdx.y;
   int tx = threadIdx.x;
   int ty = threadIdx.y;
-  int Row = blockIdx.y * SUB_WIDTH + ty;
-  int Col = blockIdx.x * SUB_WIDTH * 2 + tx * 2; // 2 wyniki na wątek z właściwym przeskalowaniem bloku
 
-  float C_local0 = 0.0f;
-  float C_local1 = 0.0f;
+  int row = by * BLOCK_SIZE + ty;
+  int col = bx * BLOCK_SIZE + tx; // Każdy wątek liczy 1 element
 
-  for (int m = 0; m < Width / SUB_WIDTH; ++m)
+  // printf("BLOCK_SIZE=%d  width A=%d width B=%d\n", BLOCK_SIZE, wA, wB);
+  // printf("Block (%d,%d) Thread (%d,%d) row=%d col=%d\n", bx, by, tx, ty, row, col);
+
+  float Csub = 0.0f;
+
+  for (int m = 0; m < wA / BLOCK_SIZE; ++m)
   {
-    // Ładowanie kafelka A
-    if (Row < Width && (m * SUB_WIDTH + tx) < Width)
-      Ads[ty][tx] = Ad[Row * Width + m * SUB_WIDTH + tx];
-    else
-      Ads[ty][tx] = 0.0f;
+    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE]; // Standardowy rozmiar dla jednego wyniku
 
-    // Ładowanie kafelka B - każdy wątek ładuje dwa elementy
-    int baseB = m * SUB_WIDTH;
-    if (baseB + ty < Width && Col < Width)
-      Bds[ty][tx * 2] = Bd[(baseB + ty) * Width + Col];
-    else
-      Bds[ty][tx * 2] = 0.0f;
+    int aRow = row;
+    int aCol = m * BLOCK_SIZE + tx;
+    int bRow = m * BLOCK_SIZE + ty;
+    int bCol = col;
 
-    if (baseB + ty < Width && Col + 1 < Width)
-      Bds[ty][tx * 2 + 1] = Bd[(baseB + ty) * Width + Col + 1];
-    else
-      Bds[ty][tx * 2 + 1] = 0.0f;
+    As[ty][tx] = A[aRow * wA + aCol];
+    Bs[ty][tx] = B[bRow * wB + bCol];
 
     __syncthreads();
-
-    // Obliczenia: każdy wątek oblicza dwa elementy C
 #pragma unroll
-    for (int k = 0; k < SUB_WIDTH; ++k)
+    for (int k = 0; k < BLOCK_SIZE; ++k)
     {
-        float a = Ads[ty][k];
-        C_local0 += a * Bds[k][tx * 2];
-        C_local1 += a * Bds[k][tx * 2 + 1];
+      Csub += As[ty][k] * Bs[k][tx];
     }
 
     __syncthreads();
   }
 
-  // Zapis wyników, jeśli w zakresie macierzy
-  if (Row < Width && Col < Width)
-    Cd[Row * Width + Col] = C_local0;
-  if (Row < Width && Col + 1 < Width)
-    Cd[Row * Width + Col + 1] = C_local1;
+  C[row * wB + col] = Csub;
+}
+
+// WERSJA A 2 wyniki
+template <int BLOCK_SIZE>
+__global__ void MatrixMulKernel_2results(float *C, float *A,
+                                         float *B, int wA,
+                                         int wB)
+{
+  int bx = blockIdx.x;
+  int by = blockIdx.y;
+  int tx = threadIdx.x;
+  int ty = threadIdx.y;
+
+  int row = by * BLOCK_SIZE + ty;
+  int col = (bx * BLOCK_SIZE + tx) * 2; // Każdy wątek liczy 2 elementy w poziomie
+
+  // printf("BLOCK_SIZE=%d  width A=%d width B=%d\n", BLOCK_SIZE, wA, wB);
+  // printf("Block (%d,%d) Thread (%d,%d) row=%d col=%d\n", bx, by, tx, ty, row, col);
+
+  float Csub1 = 0.0f;
+  float Csub2 = 0.0f;
+
+  for (int m = 0; m < wA / BLOCK_SIZE; ++m)
+  {
+    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * 2]; // x2, bo każdy wątek potrzebuje 2 kolumny
+
+    int aRow = row;
+    int aCol = m * BLOCK_SIZE + tx;
+    int bRow = m * BLOCK_SIZE + ty;
+    int bCol1 = col;
+    int bCol2 = col + 1;
+
+    As[ty][tx] = A[aRow * wA + aCol];
+
+
+    Bs[ty][tx * 2] = B[bRow * wB + bCol1];
+
+
+    Bs[ty][tx * 2 + 1] = B[bRow * wB + bCol2];
+
+
+    __syncthreads();
+#pragma unroll
+    for (int k = 0; k < BLOCK_SIZE; ++k)
+    {
+      Csub1 += As[ty][k] * Bs[k][tx * 2];
+      Csub2 += As[ty][k] * Bs[k][tx * 2 + 1];
+    }
+
+    __syncthreads();
+  }
+
+    C[row * wB + col] = Csub1;
+    C[row * wB + col + 1] = Csub2;
 }
 
 void ConstantInit(float *data, int size, float val)
@@ -313,7 +296,13 @@ int MatrixMultiply(int argc, char **argv,
 
   // Setup execution parameters
   dim3 threads(block_size, block_size);
+
+  // dla 2 wyników
   dim3 grid((dimsB.x + block_size * 2 - 1) / (block_size * 2), (dimsA.y + block_size - 1) / block_size);
+  
+  // dla 1 wyniku
+  // dim3 grid(dimsB.x / threads.x, dimsA.y / threads.y);
+
   // Create and start timer
   printf("Computing result using CUDA Kernel...\n");
 
@@ -324,6 +313,8 @@ int MatrixMultiply(int argc, char **argv,
     //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     MatrixMulKernel_2results<16>
         <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    // MatrixMulKernel_1results<16>
+    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
   else
   {
@@ -331,6 +322,8 @@ int MatrixMultiply(int argc, char **argv,
     //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     MatrixMulKernel_2results<32>
         <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    // MatrixMulKernel_1results<32>
+    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
 
   printf("done\n");
@@ -350,13 +343,17 @@ int MatrixMultiply(int argc, char **argv,
       //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
       MatrixMulKernel_2results<16>
           <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      // MatrixMulKernel_1results<16>
+      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
     else
     {
       // MatrixMulCUDA<32>
       //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
       MatrixMulKernel_2results<32>
-          <<<grid, threads, 0, stream>>>( d_C, d_A, d_B, dimsA.x, dimsB.x);
+          <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      // MatrixMulKernel_1results<32>
+      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
   }
 
