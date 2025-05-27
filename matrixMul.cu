@@ -39,6 +39,13 @@
  * Piscataway, NJ: IEEE Press, 2008, pp. Art. 31:1-11.
  */
 
+/**
+ * Changes made to the original code:
+ * - Added a parameter to specify how many results each thread computes.
+ * - Implemented a templated kernel that can handle different numbers of results per thread.
+ * - Adjusted the grid configuration to account for the number of results per thread.
+ */
+
 // System includes
 #include <stdio.h>
 #include <assert.h>
@@ -51,92 +58,10 @@
 #include <helper_functions.h>
 #include <helper_cuda.h>
 
-/**
- * Matrix multiplication (CUDA Kernel) on the device: C = A * B
- * wA is A's width and wB is B's width
- */
-template <int BLOCK_SIZE>
-__global__ void MatrixMulCUDA(float *C, float *A,
-                              float *B, int wA,
-                              int wB)
-{
-  // Block index
-  int bx = blockIdx.x;
-  int by = blockIdx.y;
-
-  // Thread index
-  int tx = threadIdx.x;
-  int ty = threadIdx.y;
-
-  // Index of the first sub-matrix of A processed by the block
-  int aBegin = wA * BLOCK_SIZE * by;
-
-  // Index of the last sub-matrix of A processed by the block
-  int aEnd = aBegin + wA - 1;
-
-  // Step size used to iterate through the sub-matrices of A
-  int aStep = BLOCK_SIZE;
-
-  // Index of the first sub-matrix of B processed by the block
-  int bBegin = BLOCK_SIZE * bx;
-
-  // Step size used to iterate through the sub-matrices of B
-  int bStep = BLOCK_SIZE * wB;
-
-  // Csub is used to store the element of the block sub-matrix
-  // that is computed by the thread
-  float Csub = 0;
-
-  // Loop over all the sub-matrices of A and B
-  // required to compute the block sub-matrix
-  for (int a = aBegin, b = bBegin;
-       a <= aEnd;
-       a += aStep, b += bStep)
-  {
-    // Declaration of the shared memory array As used to
-    // store the sub-matrix of A
-    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-
-    // Declaration of the shared memory array Bs used to
-    // store the sub-matrix of B
-    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
-
-    // Load the matrices from device memory
-    // to shared memory; each thread loads
-    // one element of each matrix
-    As[ty][tx] = A[a + wA * ty + tx];
-    Bs[ty][tx] = B[b + wB * ty + tx];
-
-    // Synchronize to make sure the matrices are loaded
-    __syncthreads();
-
-    // Multiply the two matrices together;
-    // each thread computes one element
-    // of the block sub-matrix
-#pragma unroll
-
-    for (int k = 0; k < BLOCK_SIZE; ++k)
-    {
-      Csub += As[ty][k] * Bs[k][tx];
-    }
-
-    // Synchronize to make sure that the preceding
-    // computation is done before loading two new
-    // sub-matrices of A and B in the next iteration
-    __syncthreads();
-  }
-
-  // Write the block sub-matrix to device memory;
-  // each thread writes one element
-  int c = wB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-  C[c + wB * ty + tx] = Csub;
-}
-
-// WERSJA  1 wynik
-template <int BLOCK_SIZE>
-__global__ void MatrixMulKernel_1results(float *C, float *A,
-                                         float *B, int wA,
-                                         int wB)
+// Uniwersalna wersja kernela mnożenia macierzy
+// RESULTS_PER_THREAD to parametr określający ile wyników ma obliczać jeden wątek
+template <int BLOCK_SIZE, int RESULTS_PER_THREAD>
+__global__ void MatrixMulKernel(float *C, float *A, float *B, int wA, int wB)
 {
   int bx = blockIdx.x;
   int by = blockIdx.y;
@@ -144,151 +69,60 @@ __global__ void MatrixMulKernel_1results(float *C, float *A,
   int ty = threadIdx.y;
 
   int row = by * BLOCK_SIZE + ty;
-  int col = bx * BLOCK_SIZE + tx; // Każdy wątek liczy 1 element
+  int col = (bx * BLOCK_SIZE + tx) * RESULTS_PER_THREAD; // Każdy wątek liczy RESULTS_PER_THREAD elementów w poziomie
 
-  float Csub = 0.0f;
+  // Tablica wyników na rejestrach wątku
+  float Csub[RESULTS_PER_THREAD] = {0.0f};
 
+  // Pętla po wszystkich kafelkach macierzy A i B
   for (int m = 0; m < wA / BLOCK_SIZE; ++m)
   {
+    // Deklaracje pamięci współdzielonej
     __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE]; // Standardowy rozmiar dla jednego wyniku
+    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * RESULTS_PER_THREAD]; // x RESULTS_PER_THREAD, bo tyle kolumn potrzebuje każdy wątek
 
+    // Indeksy elementów macierzy A
     int aRow = row;
     int aCol = m * BLOCK_SIZE + tx;
+
+    // Indeks wiersza macierzy B
     int bRow = m * BLOCK_SIZE + ty;
-    int bCol = col;
-
-    As[ty][tx] = A[aRow * wA + aCol];
-    Bs[ty][tx] = B[bRow * wB + bCol];
-
-    __syncthreads();
-#pragma unroll
-    for (int k = 0; k < BLOCK_SIZE; ++k)
-    {
-      Csub += As[ty][k] * Bs[k][tx];
-    }
-
-    __syncthreads();
-  }
-
-  C[row * wB + col] = Csub;
-}
-
-// WERSJA A 2 wyniki
-template <int BLOCK_SIZE>
-__global__ void MatrixMulKernel_2results(float *C, float *A,
-                                         float *B, int wA,
-                                         int wB)
-{
-  int bx = blockIdx.x;
-  int by = blockIdx.y;
-  int tx = threadIdx.x;
-  int ty = threadIdx.y;
-
-  int row = by * BLOCK_SIZE + ty;
-  int col = (bx * BLOCK_SIZE + tx) * 2; // Każdy wątek liczy 2 elementy w poziomie
-
-  float Csub1 = 0.0f;
-  float Csub2 = 0.0f;
-
-  for (int m = 0; m < wA / BLOCK_SIZE; ++m)
-  {
-    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * 2]; // x2, bo każdy wątek potrzebuje 2 kolumny
-
-    int aRow = row;
-    int aCol = m * BLOCK_SIZE + tx;
-    int bRow = m * BLOCK_SIZE + ty;
-    int bCol1 = col;
-    int bCol2 = col + 1;
-
-    As[ty][tx] = A[aRow * wA + aCol];
-
-
-    Bs[ty][tx * 2] = B[bRow * wB + bCol1];
-
-
-    Bs[ty][tx * 2 + 1] = B[bRow * wB + bCol2];
-
-
-    __syncthreads();
-#pragma unroll
-    for (int k = 0; k < BLOCK_SIZE; ++k)
-    {
-      Csub1 += As[ty][k] * Bs[k][tx * 2];
-      Csub2 += As[ty][k] * Bs[k][tx * 2 + 1];
-    }
-
-    __syncthreads();
-  }
-
-    C[row * wB + col] = Csub1;
-    C[row * wB + col + 1] = Csub2;
-}
-
-// WERSJA B 4 wyniki
-template <int BLOCK_SIZE>
-__global__ void MatrixMulKernel_4results(float *C, float *A,
-                                         float *B, int wA,
-                                         int wB)
-{
-  int bx = blockIdx.x;
-  int by = blockIdx.y;
-  int tx = threadIdx.x;
-  int ty = threadIdx.y;
-
-  int row = by * BLOCK_SIZE + ty;
-  int col = (bx * BLOCK_SIZE + tx) * 4; // Każdy wątek liczy 4 elementy w poziomie
-
-  float Csub1 = 0.0f;
-  float Csub2 = 0.0f;
-  float Csub3 = 0.0f;
-  float Csub4 = 0.0f;
-
-  for (int m = 0; m < wA / BLOCK_SIZE; ++m)
-  {
-    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * 4]; // x4, bo każdy wątek potrzebuje 4 kolumny
-
-    int aRow = row;
-    int aCol = m * BLOCK_SIZE + tx;
-    int bRow = m * BLOCK_SIZE + ty;
-    int bCol1 = col;
-    int bCol2 = col + 1;
-    int bCol3 = col + 2;
-    int bCol4 = col + 3;
 
     // Ładujemy dane macierzy A do pamięci współdzielonej
     As[ty][tx] = A[aRow * wA + aCol];
 
-    // Ładujemy dane macierzy B do pamięci współdzielonej
-    // Każdy wątek ładuje 4 elementy z macierzy B
-    Bs[ty][tx * 4] = B[bRow * wB + bCol1];
-    Bs[ty][tx * 4 + 1] = B[bRow * wB + bCol2];
-    Bs[ty][tx * 4 + 2] = B[bRow * wB + bCol3];
-    Bs[ty][tx * 4 + 3] = B[bRow * wB + bCol4];
+// Ładujemy dane macierzy B do pamięci współdzielonej
+// Każdy wątek ładuje RESULTS_PER_THREAD elementów
+#pragma unroll
+    for (int i = 0; i < RESULTS_PER_THREAD; i++)
+    {
+      int bCol = col + i;
+      Bs[ty][tx * RESULTS_PER_THREAD + i] = B[bRow * wB + bCol];
+    }
 
     __syncthreads();
-    
-    // Mnożenie macierzy
+
+// Mnożenie macierzy
 #pragma unroll
     for (int k = 0; k < BLOCK_SIZE; ++k)
     {
       float aElement = As[ty][k];
-      Csub1 += aElement * Bs[k][tx * 4];
-      Csub2 += aElement * Bs[k][tx * 4 + 1];
-      Csub3 += aElement * Bs[k][tx * 4 + 2];
-      Csub4 += aElement * Bs[k][tx * 4 + 3];
+#pragma unroll
+      for (int i = 0; i < RESULTS_PER_THREAD; i++)
+      {
+        Csub[i] += aElement * Bs[k][tx * RESULTS_PER_THREAD + i];
+      }
     }
 
     __syncthreads();
   }
 
-  // Zapisanie wyników do pamięci globalnej
-  C[row * wB + col] = Csub1;
-  C[row * wB + col + 1] = Csub2;
-  C[row * wB + col + 2] = Csub3;
-  C[row * wB + col + 3] = Csub4;
+// Zapisanie wyników do pamięci globalnej
+#pragma unroll
+  for (int i = 0; i < RESULTS_PER_THREAD; i++)
+  {
+    C[row * wB + col + i] = Csub[i];
+  }
 }
 
 void ConstantInit(float *data, int size, float val)
@@ -299,13 +133,14 @@ void ConstantInit(float *data, int size, float val)
   }
 }
 
-/**
- * Run a simple test of matrix multiplication using CUDA
- */
-int MatrixMultiply(int argc, char **argv,
-                   int block_size, const dim3 &dimsA,
-                   const dim3 &dimsB)
+// Funkcja testująca mnożenie macierzy dla określonej liczby wyników na wątek
+template <int RESULTS_PER_THREAD>
+bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
 {
+  printf("\n-------------------------------------------------\n");
+  printf("Testowanie mnożenia macierzy z %d wynikami na wątek:\n", RESULTS_PER_THREAD);
+  printf("-------------------------------------------------\n");
+
   // Allocate host memory for matrices A and B
   unsigned int size_A = dimsA.x * dimsA.y;
   unsigned int mem_size_A = sizeof(float) * size_A;
@@ -334,12 +169,13 @@ int MatrixMultiply(int argc, char **argv,
   if (h_C == NULL)
   {
     fprintf(stderr, "Failed to allocate host matrix C!\n");
-    exit(EXIT_FAILURE);
+    return false;
   }
 
   checkCudaErrors(cudaMalloc(reinterpret_cast<void **>(&d_A), mem_size_A));
   checkCudaErrors(cudaMalloc(reinterpret_cast<void **>(&d_B), mem_size_B));
   checkCudaErrors(cudaMalloc(reinterpret_cast<void **>(&d_C), mem_size_C));
+
   // Allocate CUDA events that we'll use for timing
   cudaEvent_t start, stop;
   checkCudaErrors(cudaEventCreate(&start));
@@ -356,43 +192,24 @@ int MatrixMultiply(int argc, char **argv,
   // Setup execution parameters
   dim3 threads(block_size, block_size);
 
-  // dla 4 wyników
-  dim3 grid((dimsB.x + block_size * 4 - 1) / (block_size * 4), (dimsA.y + block_size - 1) / block_size);
+  // Konfiguracja siatki zależna od liczby wyników na wątek
+  dim3 grid((dimsB.x + block_size * RESULTS_PER_THREAD - 1) / (block_size * RESULTS_PER_THREAD),
+            (dimsA.y + block_size - 1) / block_size);
 
-  // dla 2 wyników
-  // dim3 grid((dimsB.x + block_size * 2 - 1) / (block_size * 2), (dimsA.y + block_size - 1) / block_size);
-  
-  // dla 1 wyniku
-  // dim3 grid(dimsB.x / threads.x, dimsA.y / threads.y);
-
-  // Create and start timer
+  printf("Konfiguracja siatki: [%d x %d], wątki/blok: %d\n", grid.x, grid.y, threads.x * threads.y);
   printf("Computing result using CUDA Kernel...\n");
 
-  // Performs warmup operation using matrixMul CUDA kernel
+  // Performs warmup operation using MatrixMul CUDA kernel
   if (block_size == 16)
   {
-    // MatrixMulCUDA<16>
-    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    MatrixMulKernel_4results<16>
-        <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    // MatrixMulKernel_2results<16>
-    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    // MatrixMulKernel_1results<16>
-    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    MatrixMulKernel<16, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
   else
   {
-    // MatrixMulCUDA<32>
-    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    MatrixMulKernel_4results<32>
-      <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    // MatrixMulKernel_2results<32>
-    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    // MatrixMulKernel_1results<32>
-    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    MatrixMulKernel<32, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
 
-  printf("done\n");
+  printf("Wykonano rozgrzewkę\n");
   checkCudaErrors(cudaStreamSynchronize(stream));
 
   // Record the start event
@@ -400,30 +217,17 @@ int MatrixMultiply(int argc, char **argv,
 
   // Execute the kernel
   int nIter = 1;
+  printf("Wykonywanie %d iteracji...\n", nIter);
 
   for (int j = 0; j < nIter; j++)
   {
     if (block_size == 16)
     {
-      // MatrixMulCUDA<16>
-      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      MatrixMulKernel_4results<16>
-          <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      // MatrixMulKernel_2results<16>
-      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      // MatrixMulKernel_1results<16>
-      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      MatrixMulKernel<16, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
     else
     {
-      // MatrixMulCUDA<32>
-      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      MatrixMulKernel_4results<32>
-          <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      // MatrixMulKernel_2results<32>
-      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      // MatrixMulKernel_1results<32>
-      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      MatrixMulKernel<32, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
   }
 
@@ -444,21 +248,22 @@ int MatrixMultiply(int argc, char **argv,
   double gigaFlops =
       (flopsPerMatrixMul * 1.0e-9f) / (msecPerMatrixMul / 1000.0f);
   printf(
-      "Performance= %.2f GFlop/s, Time= %.3f msec, Size= %.0f Ops,"
-      " WorkgroupSize= %u threads/block\n",
-      gigaFlops, msecPerMatrixMul, flopsPerMatrixMul, threads.x * threads.y);
+      "Wydajność dla %d wyników na wątek = %.2f GFlop/s, Czas = %.3f ms, Operacji = %.0f, Wątków/blok = %u\n",
+      RESULTS_PER_THREAD, gigaFlops, msecPerMatrixMul, flopsPerMatrixMul, threads.x * threads.y);
 
   // Copy result from device to host
   checkCudaErrors(
       cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost, stream));
   checkCudaErrors(cudaStreamSynchronize(stream));
 
-  printf("Checking computed result for correctness: ");
+  printf("Sprawdzanie poprawności wyników dla %d wyników na wątek: ", RESULTS_PER_THREAD);
   bool correct = true;
 
   // test relative error by the formula
   //     |<x, y>_cpu - <x,y>_gpu|/<|x|, |y|>  < eps
-  double eps = 1.e-4; // 1.e-6;  // machine zero
+  double eps = 1.e-4; // machine zero
+  int errorCount = 0;
+  const int MAX_ERRORS_TO_PRINT = 10;
 
   for (int i = 0; i < static_cast<int>(dimsC.x * dimsC.y); i++)
   {
@@ -469,13 +274,23 @@ int MatrixMultiply(int argc, char **argv,
 
     if (rel_err > eps)
     {
-      printf("Error! Matrix[%05d]=%.8f, ref=%.8f error term is > %E\n",
-             i, h_C[i], dimsA.x * valB, eps);
+      if (errorCount < MAX_ERRORS_TO_PRINT)
+      {
+        printf("\nBłąd! Matrix[%05d]=%.8f, oczekiwano=%.8f, różnica względna > %E",
+               i, h_C[i], dimsA.x * valB, eps);
+      }
+      errorCount++;
       correct = false;
     }
   }
 
-  printf("%s\n", correct ? "Result = PASS" : "Result = FAIL");
+  if (errorCount > MAX_ERRORS_TO_PRINT)
+  {
+    printf("\n...i %d więcej błędów", errorCount - MAX_ERRORS_TO_PRINT);
+  }
+
+  printf("\nWynik dla %d wyników na wątek = %s\n", RESULTS_PER_THREAD,
+         correct ? "POPRAWNY" : "NIEPOPRAWNY");
 
   // Clean up memory
   checkCudaErrors(cudaFreeHost(h_A));
@@ -486,71 +301,24 @@ int MatrixMultiply(int argc, char **argv,
   checkCudaErrors(cudaFree(d_C));
   checkCudaErrors(cudaEventDestroy(start));
   checkCudaErrors(cudaEventDestroy(stop));
-  printf(
-      "\nNOTE: The CUDA Samples are not meant for performance "
-      "measurements. Results may vary when GPU Boost is enabled.\n");
 
-  if (correct)
-  {
-    return EXIT_SUCCESS;
-  }
-  else
-  {
-    return EXIT_FAILURE;
-  }
+  return correct;
 }
 
 /**
- * Program main
+ * Program main - wykonuje testy dla różnych konfiguracji
  */
 int main(int argc, char **argv)
 {
   printf("[Matrix Multiply Using CUDA] - Starting...\n");
 
-  if (checkCmdLineFlag(argc, (const char **)argv, "help") ||
-      checkCmdLineFlag(argc, (const char **)argv, "?"))
-  {
-    printf("Usage -device=n (n >= 0 for deviceID)\n");
-    printf("      -wA=WidthA -hA=HeightA (Width x Height of Matrix A)\n");
-    printf("      -wB=WidthB -hB=HeightB (Width x Height of Matrix B)\n");
-    printf("  Note: Outer matrix dimensions of A & B matrices"
-           " must be equal.\n");
-
-    exit(EXIT_SUCCESS);
-  }
-
-  // This will pick the best possible CUDA capable device, otherwise
-  // override the device ID based on input provided at the command line
+  // This will pick the best possible CUDA capable device
   int dev = findCudaDevice(argc, (const char **)argv);
 
   int block_size = 32;
 
   dim3 dimsA(50 * 2 * block_size, 50 * 2 * block_size, 1);
   dim3 dimsB(50 * 2 * block_size, 50 * 2 * block_size, 1);
-
-  // width of Matrix A
-  if (checkCmdLineFlag(argc, (const char **)argv, "wA"))
-  {
-    dimsA.x = getCmdLineArgumentInt(argc, (const char **)argv, "wA");
-  }
-
-  // height of Matrix A
-  if (checkCmdLineFlag(argc, (const char **)argv, "hA"))
-  {
-    dimsA.y = getCmdLineArgumentInt(argc, (const char **)argv, "hA");
-  }
-
-  // width of Matrix B
-  if (checkCmdLineFlag(argc, (const char **)argv, "wB"))
-  {
-    dimsB.x = getCmdLineArgumentInt(argc, (const char **)argv, "wB");
-  }
-
-  // height of Matrix B
-  if (checkCmdLineFlag(argc, (const char **)argv, "hB"))
-  {
-    dimsB.y = getCmdLineArgumentInt(argc, (const char **)argv, "hB");
-  }
 
   if (dimsA.x != dimsB.y)
   {
@@ -563,9 +331,25 @@ int main(int argc, char **argv)
          dimsB.x, dimsB.y);
 
   checkCudaErrors(cudaProfilerStart());
-  int matrix_result = MatrixMultiply(argc, argv, block_size, dimsA, dimsB);
+
+  // Wykonujemy testy dla różnych liczb wyników na wątek
+  bool result1 = RunMatrixMultiplyTest<1>(block_size, dimsA, dimsB);
+  bool result2 = RunMatrixMultiplyTest<2>(block_size, dimsA, dimsB);
+  bool result4 = RunMatrixMultiplyTest<4>(block_size, dimsA, dimsB);
+  bool result8 = RunMatrixMultiplyTest<8>(block_size, dimsA, dimsB);
+
+  // Wyświetlenie podsumowania
+  printf("\n== PODSUMOWANIE ==\n");
+  printf("Test z 1 wynikiem na wątek: %s\n", result1 ? "POPRAWNY" : "NIEPOPRAWNY");
+  printf("Test z 2 wynikami na wątek: %s\n", result2 ? "POPRAWNY" : "NIEPOPRAWNY");
+  printf("Test z 4 wynikami na wątek: %s\n", result4 ? "POPRAWNY" : "NIEPOPRAWNY");
+  printf("Test z 8 wynikami na wątek: %s\n", result8 ? "POPRAWNY" : "NIEPOPRAWNY");
+
   checkCudaErrors(cudaProfilerStop());
   checkCudaErrors(cudaDeviceSynchronize());
 
-  exit(matrix_result);
+  if (result1 && result2 && result4 && result8)
+    return EXIT_SUCCESS;
+  else
+    return EXIT_FAILURE;
 }
