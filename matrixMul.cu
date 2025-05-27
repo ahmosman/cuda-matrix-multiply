@@ -58,8 +58,8 @@
 #include <helper_functions.h>
 #include <helper_cuda.h>
 
-// Uniwersalna wersja kernela mnożenia macierzy
-// RESULTS_PER_THREAD to parametr określający ile wyników ma obliczać jeden wątek
+// Universal version of matrix multiplication kernel
+// RESULTS_PER_THREAD is a parameter specifying how many results each thread computes
 template <int BLOCK_SIZE, int RESULTS_PER_THREAD>
 __global__ void MatrixMulKernel(float *C, float *A, float *B, int wA, int wB)
 {
@@ -69,30 +69,30 @@ __global__ void MatrixMulKernel(float *C, float *A, float *B, int wA, int wB)
   int ty = threadIdx.y;
 
   int row = by * BLOCK_SIZE + ty;
-  int col = (bx * BLOCK_SIZE + tx) * RESULTS_PER_THREAD; // Każdy wątek liczy RESULTS_PER_THREAD elementów w poziomie
+  int col = (bx * BLOCK_SIZE + tx) * RESULTS_PER_THREAD; // Each thread calculates RESULTS_PER_THREAD elements horizontally
 
-  // Tablica wyników na rejestrach wątku
+  // Array for results in thread registers
   float Csub[RESULTS_PER_THREAD] = {0.0f};
 
-  // Pętla po wszystkich kafelkach macierzy A i B
+  // Loop over all tiles of matrices A and B
   for (int m = 0; m < wA / BLOCK_SIZE; ++m)
   {
-    // Deklaracje pamięci współdzielonej
+    // Shared memory declarations
     __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * RESULTS_PER_THREAD]; // x RESULTS_PER_THREAD, bo tyle kolumn potrzebuje każdy wątek
+    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * RESULTS_PER_THREAD]; // x RESULTS_PER_THREAD because each thread needs that many columns
 
-    // Indeksy elementów macierzy A
+    // Indices for matrix A elements
     int aRow = row;
     int aCol = m * BLOCK_SIZE + tx;
 
-    // Indeks wiersza macierzy B
+    // Matrix B row index
     int bRow = m * BLOCK_SIZE + ty;
 
-    // Ładujemy dane macierzy A do pamięci współdzielonej
+    // Load matrix A data to shared memory
     As[ty][tx] = A[aRow * wA + aCol];
 
-// Ładujemy dane macierzy B do pamięci współdzielonej
-// Każdy wątek ładuje RESULTS_PER_THREAD elementów
+// Load matrix B data to shared memory
+// Each thread loads RESULTS_PER_THREAD elements
 #pragma unroll
     for (int i = 0; i < RESULTS_PER_THREAD; i++)
     {
@@ -102,7 +102,7 @@ __global__ void MatrixMulKernel(float *C, float *A, float *B, int wA, int wB)
 
     __syncthreads();
 
-// Mnożenie macierzy
+// Matrix multiplication
 #pragma unroll
     for (int k = 0; k < BLOCK_SIZE; ++k)
     {
@@ -117,7 +117,7 @@ __global__ void MatrixMulKernel(float *C, float *A, float *B, int wA, int wB)
     __syncthreads();
   }
 
-// Zapisanie wyników do pamięci globalnej
+// Save results to global memory
 #pragma unroll
   for (int i = 0; i < RESULTS_PER_THREAD; i++)
   {
@@ -133,12 +133,12 @@ void ConstantInit(float *data, int size, float val)
   }
 }
 
-// Funkcja testująca mnożenie macierzy dla określonej liczby wyników na wątek
+// Function testing matrix multiplication for a specific number of results per thread
 template <int RESULTS_PER_THREAD>
 bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
 {
   printf("\n-------------------------------------------------\n");
-  printf("Testowanie mnożenia macierzy z %d wynikami na wątek:\n", RESULTS_PER_THREAD);
+  printf("Testing matrix multiplication with %d results per thread:\n", RESULTS_PER_THREAD);
   printf("-------------------------------------------------\n");
 
   // Allocate host memory for matrices A and B
@@ -192,11 +192,11 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
   // Setup execution parameters
   dim3 threads(block_size, block_size);
 
-  // Konfiguracja siatki zależna od liczby wyników na wątek
+  // Grid configuration dependent on the number of results per thread
   dim3 grid((dimsB.x + block_size * RESULTS_PER_THREAD - 1) / (block_size * RESULTS_PER_THREAD),
             (dimsA.y + block_size - 1) / block_size);
 
-  printf("Konfiguracja siatki: [%d x %d], wątki/blok: %d\n", grid.x, grid.y, threads.x * threads.y);
+  printf("Grid configuration: [%d x %d], threads/block: %d\n", grid.x, grid.y, threads.x * threads.y);
   printf("Computing result using CUDA Kernel...\n");
 
   // Performs warmup operation using MatrixMul CUDA kernel
@@ -209,7 +209,7 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
     MatrixMulKernel<32, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
 
-  printf("Wykonano rozgrzewkę\n");
+  printf("Warmup completed\n");
   checkCudaErrors(cudaStreamSynchronize(stream));
 
   // Record the start event
@@ -217,7 +217,7 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
 
   // Execute the kernel
   int nIter = 1;
-  printf("Wykonywanie %d iteracji...\n", nIter);
+  printf("Executing %d iterations...\n", nIter);
 
   for (int j = 0; j < nIter; j++)
   {
@@ -248,7 +248,7 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
   double gigaFlops =
       (flopsPerMatrixMul * 1.0e-9f) / (msecPerMatrixMul / 1000.0f);
   printf(
-      "Wydajność dla %d wyników na wątek = %.2f GFlop/s, Czas = %.3f ms, Operacji = %.0f, Wątków/blok = %u\n",
+      "Performance for %d results per thread = %.2f GFlop/s, Time = %.3f ms, Operations = %.0f, Threads/block = %u\n",
       RESULTS_PER_THREAD, gigaFlops, msecPerMatrixMul, flopsPerMatrixMul, threads.x * threads.y);
 
   // Copy result from device to host
@@ -256,7 +256,7 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
       cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost, stream));
   checkCudaErrors(cudaStreamSynchronize(stream));
 
-  printf("Sprawdzanie poprawności wyników dla %d wyników na wątek: ", RESULTS_PER_THREAD);
+  printf("Checking results correctness for %d results per thread: ", RESULTS_PER_THREAD);
   bool correct = true;
 
   // test relative error by the formula
@@ -276,7 +276,7 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
     {
       if (errorCount < MAX_ERRORS_TO_PRINT)
       {
-        printf("\nBłąd! Matrix[%05d]=%.8f, oczekiwano=%.8f, różnica względna > %E",
+        printf("\nError! Matrix[%05d]=%.8f, expected=%.8f, relative diff > %E",
                i, h_C[i], dimsA.x * valB, eps);
       }
       errorCount++;
@@ -286,11 +286,11 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
 
   if (errorCount > MAX_ERRORS_TO_PRINT)
   {
-    printf("\n...i %d więcej błędów", errorCount - MAX_ERRORS_TO_PRINT);
+    printf("\n...and %d more errors", errorCount - MAX_ERRORS_TO_PRINT);
   }
 
-  printf("\nWynik dla %d wyników na wątek = %s\n", RESULTS_PER_THREAD,
-         correct ? "POPRAWNY" : "NIEPOPRAWNY");
+  printf("\nResult for %d results per thread = %s\n", RESULTS_PER_THREAD,
+         correct ? "CORRECT" : "INCORRECT");
 
   // Clean up memory
   checkCudaErrors(cudaFreeHost(h_A));
@@ -306,7 +306,7 @@ bool RunMatrixMultiplyTest(int block_size, const dim3 &dimsA, const dim3 &dimsB)
 }
 
 /**
- * Program main - wykonuje testy dla różnych konfiguracji
+ * Program main - runs tests for different configurations
  */
 int main(int argc, char **argv)
 {
@@ -332,18 +332,18 @@ int main(int argc, char **argv)
 
   checkCudaErrors(cudaProfilerStart());
 
-  // Wykonujemy testy dla różnych liczb wyników na wątek
+  // Run tests for different numbers of results per thread
   bool result1 = RunMatrixMultiplyTest<1>(block_size, dimsA, dimsB);
   bool result2 = RunMatrixMultiplyTest<2>(block_size, dimsA, dimsB);
   bool result4 = RunMatrixMultiplyTest<4>(block_size, dimsA, dimsB);
   bool result8 = RunMatrixMultiplyTest<8>(block_size, dimsA, dimsB);
 
-  // Wyświetlenie podsumowania
-  printf("\n== PODSUMOWANIE ==\n");
-  printf("Test z 1 wynikiem na wątek: %s\n", result1 ? "POPRAWNY" : "NIEPOPRAWNY");
-  printf("Test z 2 wynikami na wątek: %s\n", result2 ? "POPRAWNY" : "NIEPOPRAWNY");
-  printf("Test z 4 wynikami na wątek: %s\n", result4 ? "POPRAWNY" : "NIEPOPRAWNY");
-  printf("Test z 8 wynikami na wątek: %s\n", result8 ? "POPRAWNY" : "NIEPOPRAWNY");
+  // Display summary
+  printf("\n== SUMMARY ==\n");
+  printf("Test with 1 result per thread: %s\n", result1 ? "CORRECT" : "INCORRECT");
+  printf("Test with 2 results per thread: %s\n", result2 ? "CORRECT" : "INCORRECT");
+  printf("Test with 4 results per thread: %s\n", result4 ? "CORRECT" : "INCORRECT");
+  printf("Test with 8 results per thread: %s\n", result8 ? "CORRECT" : "INCORRECT");
 
   checkCudaErrors(cudaProfilerStop());
   checkCudaErrors(cudaDeviceSynchronize());
