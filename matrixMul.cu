@@ -146,9 +146,6 @@ __global__ void MatrixMulKernel_1results(float *C, float *A,
   int row = by * BLOCK_SIZE + ty;
   int col = bx * BLOCK_SIZE + tx; // Każdy wątek liczy 1 element
 
-  // printf("BLOCK_SIZE=%d  width A=%d width B=%d\n", BLOCK_SIZE, wA, wB);
-  // printf("Block (%d,%d) Thread (%d,%d) row=%d col=%d\n", bx, by, tx, ty, row, col);
-
   float Csub = 0.0f;
 
   for (int m = 0; m < wA / BLOCK_SIZE; ++m)
@@ -191,9 +188,6 @@ __global__ void MatrixMulKernel_2results(float *C, float *A,
   int row = by * BLOCK_SIZE + ty;
   int col = (bx * BLOCK_SIZE + tx) * 2; // Każdy wątek liczy 2 elementy w poziomie
 
-  // printf("BLOCK_SIZE=%d  width A=%d width B=%d\n", BLOCK_SIZE, wA, wB);
-  // printf("Block (%d,%d) Thread (%d,%d) row=%d col=%d\n", bx, by, tx, ty, row, col);
-
   float Csub1 = 0.0f;
   float Csub2 = 0.0f;
 
@@ -230,6 +224,71 @@ __global__ void MatrixMulKernel_2results(float *C, float *A,
 
     C[row * wB + col] = Csub1;
     C[row * wB + col + 1] = Csub2;
+}
+
+// WERSJA B 4 wyniki
+template <int BLOCK_SIZE>
+__global__ void MatrixMulKernel_4results(float *C, float *A,
+                                         float *B, int wA,
+                                         int wB)
+{
+  int bx = blockIdx.x;
+  int by = blockIdx.y;
+  int tx = threadIdx.x;
+  int ty = threadIdx.y;
+
+  int row = by * BLOCK_SIZE + ty;
+  int col = (bx * BLOCK_SIZE + tx) * 4; // Każdy wątek liczy 4 elementy w poziomie
+
+  float Csub1 = 0.0f;
+  float Csub2 = 0.0f;
+  float Csub3 = 0.0f;
+  float Csub4 = 0.0f;
+
+  for (int m = 0; m < wA / BLOCK_SIZE; ++m)
+  {
+    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * 4]; // x4, bo każdy wątek potrzebuje 4 kolumny
+
+    int aRow = row;
+    int aCol = m * BLOCK_SIZE + tx;
+    int bRow = m * BLOCK_SIZE + ty;
+    int bCol1 = col;
+    int bCol2 = col + 1;
+    int bCol3 = col + 2;
+    int bCol4 = col + 3;
+
+    // Ładujemy dane macierzy A do pamięci współdzielonej
+    As[ty][tx] = A[aRow * wA + aCol];
+
+    // Ładujemy dane macierzy B do pamięci współdzielonej
+    // Każdy wątek ładuje 4 elementy z macierzy B
+    Bs[ty][tx * 4] = B[bRow * wB + bCol1];
+    Bs[ty][tx * 4 + 1] = B[bRow * wB + bCol2];
+    Bs[ty][tx * 4 + 2] = B[bRow * wB + bCol3];
+    Bs[ty][tx * 4 + 3] = B[bRow * wB + bCol4];
+
+    __syncthreads();
+    
+    // Mnożenie macierzy
+#pragma unroll
+    for (int k = 0; k < BLOCK_SIZE; ++k)
+    {
+      float aElement = As[ty][k];
+      Csub1 += aElement * Bs[k][tx * 4];
+      Csub2 += aElement * Bs[k][tx * 4 + 1];
+      Csub3 += aElement * Bs[k][tx * 4 + 2];
+      Csub4 += aElement * Bs[k][tx * 4 + 3];
+    }
+
+    __syncthreads();
+  }
+
+  // Zapisanie wyników do pamięci globalnej
+  C[row * wB + col] = Csub1;
+  C[row * wB + col + 1] = Csub2;
+  C[row * wB + col + 2] = Csub3;
+  C[row * wB + col + 3] = Csub4;
 }
 
 void ConstantInit(float *data, int size, float val)
@@ -297,8 +356,11 @@ int MatrixMultiply(int argc, char **argv,
   // Setup execution parameters
   dim3 threads(block_size, block_size);
 
+  // dla 4 wyników
+  dim3 grid((dimsB.x + block_size * 4 - 1) / (block_size * 4), (dimsA.y + block_size - 1) / block_size);
+
   // dla 2 wyników
-  dim3 grid((dimsB.x + block_size * 2 - 1) / (block_size * 2), (dimsA.y + block_size - 1) / block_size);
+  // dim3 grid((dimsB.x + block_size * 2 - 1) / (block_size * 2), (dimsA.y + block_size - 1) / block_size);
   
   // dla 1 wyniku
   // dim3 grid(dimsB.x / threads.x, dimsA.y / threads.y);
@@ -311,8 +373,10 @@ int MatrixMultiply(int argc, char **argv,
   {
     // MatrixMulCUDA<16>
     //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    MatrixMulKernel_2results<16>
+    MatrixMulKernel_4results<16>
         <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    // MatrixMulKernel_2results<16>
+    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     // MatrixMulKernel_1results<16>
     //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
@@ -320,8 +384,10 @@ int MatrixMultiply(int argc, char **argv,
   {
     // MatrixMulCUDA<32>
     //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    MatrixMulKernel_2results<32>
-        <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    MatrixMulKernel_4results<32>
+      <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    // MatrixMulKernel_2results<32>
+    //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     // MatrixMulKernel_1results<32>
     //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
@@ -341,8 +407,10 @@ int MatrixMultiply(int argc, char **argv,
     {
       // MatrixMulCUDA<16>
       //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      MatrixMulKernel_2results<16>
+      MatrixMulKernel_4results<16>
           <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      // MatrixMulKernel_2results<16>
+      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
       // MatrixMulKernel_1results<16>
       //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
@@ -350,8 +418,10 @@ int MatrixMultiply(int argc, char **argv,
     {
       // MatrixMulCUDA<32>
       //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-      MatrixMulKernel_2results<32>
+      MatrixMulKernel_4results<32>
           <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+      // MatrixMulKernel_2results<32>
+      //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
       // MatrixMulKernel_1results<32>
       //     <<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
