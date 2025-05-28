@@ -1,58 +1,11 @@
-/* Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *  * Neither the name of NVIDIA CORPORATION nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
- * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * Matrix multiplication: C = A * B.
- * Host code.
- *
- * This sample implements matrix multiplication which makes use of shared memory
- * to ensure data reuse, the matrix multiplication is done using tiling approach.
- * It has been written for clarity of exposition to illustrate various CUDA programming
- * principles, not with the goal of providing the most performant generic kernel for matrix multiplication.
- * See also:
- * V. Volkov and J. Demmel, "Benchmarking GPUs to tune dense linear algebra,"
- * in Proc. 2008 ACM/IEEE Conf. on Supercomputing (SC '08),
- * Piscataway, NJ: IEEE Press, 2008, pp. Art. 31:1-11.
- */
-
-/**
- * Changes made to the original code:
- * - Added a parameter to specify how many results each thread computes.
- * - Implemented a templated kernel that can handle different numbers of results per thread.
- * - Adjusted the grid configuration to account for the number of results per thread.
- * - Added random matrix generation instead of constant values.
- * - Added CPU matrix multiplication for validation.
- */
-
 // System includes
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 // CUDA runtime
 #include <cuda_runtime.h>
@@ -62,74 +15,11 @@
 #include <helper_functions.h>
 #include <helper_cuda.h>
 
-// Universal version of matrix multiplication kernel
-// RESULTS_PER_THREAD is a parameter specifying how many results each thread computes
-template <int BLOCK_SIZE, int RESULTS_PER_THREAD>
-__global__ void MatrixMulKernel(float *C, float *A, float *B, int wA, int wB)
-{
-  int bx = blockIdx.x;
-  int by = blockIdx.y;
-  int tx = threadIdx.x;
-  int ty = threadIdx.y;
+// File paths for cached data
+const char *MATRIX_A_FILE = "matrix_A.bin";
+const char *MATRIX_B_FILE = "matrix_B.bin";
+const char *MATRIX_C_REF_FILE = "matrix_C_ref.bin";
 
-  int row = by * BLOCK_SIZE + ty;
-  int col = (bx * BLOCK_SIZE + tx) * RESULTS_PER_THREAD; // Each thread calculates RESULTS_PER_THREAD elements horizontally
-
-  // Array for results in thread registers
-  float Csub[RESULTS_PER_THREAD] = {0.0f};
-
-  // Loop over all tiles of matrices A and B
-  for (int m = 0; m < wA / BLOCK_SIZE; ++m)
-  {
-    // Shared memory declarations
-    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * RESULTS_PER_THREAD]; // x RESULTS_PER_THREAD because each thread needs that many columns
-
-    // Indices for matrix A elements
-    int aRow = row;
-    int aCol = m * BLOCK_SIZE + tx;
-
-    // Matrix B row index
-    int bRow = m * BLOCK_SIZE + ty;
-
-    // Load matrix A data to shared memory
-    As[ty][tx] = A[aRow * wA + aCol];
-
-// Load matrix B data to shared memory
-// Each thread loads RESULTS_PER_THREAD elements
-#pragma unroll
-    for (int i = 0; i < RESULTS_PER_THREAD; i++)
-    {
-      int bCol = col + i;
-      Bs[ty][tx * RESULTS_PER_THREAD + i] = B[bRow * wB + bCol];
-    }
-
-    __syncthreads();
-
-// Matrix multiplication
-#pragma unroll
-    for (int k = 0; k < BLOCK_SIZE; ++k)
-    {
-      float aElement = As[ty][k];
-#pragma unroll
-      for (int i = 0; i < RESULTS_PER_THREAD; i++)
-      {
-        Csub[i] += aElement * Bs[k][tx * RESULTS_PER_THREAD + i];
-      }
-    }
-
-    __syncthreads();
-  }
-
-// Save results to global memory
-#pragma unroll
-  for (int i = 0; i < RESULTS_PER_THREAD; i++)
-  {
-    C[row * wB + col + i] = Csub[i];
-  }
-}
-
-// Initialize array with random values between 0 and 10000 with 2 decimal places
 void RandomInit(float *data, int size)
 {
   for (int i = 0; i < size; ++i)
@@ -160,13 +50,114 @@ void MatrixMulCPU(float *C, const float *A, const float *B, int hA, int wA, int 
   }
 }
 
-// Function testing matrix multiplication for a specific number of results per thread
-template <int RESULTS_PER_THREAD>
-bool RunMatrixMultiplyTest(int block_size, float *h_A, float *h_B, float *h_C_cpu,
-                           const dim3 &dimsA, const dim3 &dimsB)
+// Function to save matrix data to a file
+bool SaveMatrixToFile(const char *filename, float *data, size_t size)
+{
+  std::ofstream file(filename, std::ios::binary);
+  if (!file.is_open())
+  {
+    printf("Failed to open file %s for writing\n", filename);
+    return false;
+  }
+
+  file.write(reinterpret_cast<char *>(data), size * sizeof(float));
+  file.close();
+  printf("Matrix saved to %s\n", filename);
+  return true;
+}
+
+// Function to load matrix data from a file
+bool LoadMatrixFromFile(const char *filename, float *data, size_t size)
+{
+  std::ifstream file(filename, std::ios::binary);
+  if (!file.is_open())
+  {
+    printf("File %s not found\n", filename);
+    return false;
+  }
+
+  file.read(reinterpret_cast<char *>(data), size * sizeof(float));
+  if (!file)
+  {
+    printf("Error reading from file %s\n", filename);
+    file.close();
+    return false;
+  }
+
+  file.close();
+  printf("Matrix loaded from %s\n", filename);
+  return true;
+}
+
+// Special version of matrix multiplication kernel for 4 results per thread in 2x2 pattern
+template <int BLOCK_SIZE>
+__global__ void MatrixMulKernel2x2(float *C, float *A, float *B, int wA, int wB)
+{
+  int bx = blockIdx.x;
+  int by = blockIdx.y;
+  int tx = threadIdx.x;
+  int ty = threadIdx.y;
+
+  // Each thread computes a 2x2 block of results
+  // Calculate top-left corner of the 2x2 block this thread computes
+  int row = by * BLOCK_SIZE * 2 + ty * 2;
+  int col = bx * BLOCK_SIZE * 2 + tx * 2;
+
+  // Each thread accumulates results for 4 elements in a 2x2 block
+  float Csub00 = 0.0f; // top-left element [row][col]
+  float Csub01 = 0.0f; // top-right element [row][col+1]
+  float Csub10 = 0.0f; // bottom-left element [row+1][col]
+  float Csub11 = 0.0f; // bottom-right element [row+1][col+1]
+
+  // Loop over all tiles of matrices A and B
+  for (int m = 0; m < (wA / BLOCK_SIZE); ++m)
+  {
+    // Shared memory declarations
+    __shared__ float As[BLOCK_SIZE * 2][BLOCK_SIZE];
+    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE * 2];
+
+    // Each thread loads two elements fA (row and row+1)or matrix
+    As[ty * 2][tx] = A[row * wA + (m * BLOCK_SIZE + tx)];
+    As[ty * 2 + 1][tx] = A[(row + 1) * wA + (m * BLOCK_SIZE + tx)];
+
+    // Each thread loads two elements for matrix B (col and col+1)
+    Bs[ty][tx * 2] = B[(m * BLOCK_SIZE + ty) * wB + col];
+    Bs[ty][tx * 2 + 1] = B[(m * BLOCK_SIZE + ty) * wB + (col + 1)];
+
+    __syncthreads();
+
+// Compute partial dot products for the 2x2 block
+#pragma unroll
+    for (int k = 0; k < BLOCK_SIZE; ++k)
+    {
+      float a_row = As[ty * 2][k];
+      float a_row1 = As[ty * 2 + 1][k];
+
+      float b_col = Bs[k][tx * 2];
+      float b_col1 = Bs[k][tx * 2 + 1];
+
+      Csub00 += a_row * b_col;   // C[row][col]
+      Csub01 += a_row * b_col1;  // C[row][col+1]
+      Csub10 += a_row1 * b_col;  // C[row+1][col]
+      Csub11 += a_row1 * b_col1; // C[row+1][col+1]
+    }
+
+    __syncthreads();
+  }
+
+  // Write the 2x2 block results to global memory
+  C[row * wB + col] = Csub00;
+  C[row * wB + (col + 1)] = Csub01;
+  C[(row + 1) * wB + col] = Csub10;
+  C[(row + 1) * wB + (col + 1)] = Csub11;
+}
+
+// Modified function to run the 2x2 pattern for 4 results per thread
+bool RunMatrixMultiply4ResultsTest(int block_size, float *h_A, float *h_B, float *h_C_cpu,
+                                   const dim3 &dimsA, const dim3 &dimsB)
 {
   printf("\n-------------------------------------------------\n");
-  printf("Testing matrix multiplication with %d results per thread:\n", RESULTS_PER_THREAD);
+  printf("Testing matrix multiplication with 4 results per thread (2x2 pattern):\n");
   printf("-------------------------------------------------\n");
 
   // Calculate sizes
@@ -212,23 +203,22 @@ bool RunMatrixMultiplyTest(int block_size, float *h_A, float *h_B, float *h_C_cp
   checkCudaErrors(cudaMemset(d_C, 0, mem_size_C));
 
   // Setup execution parameters
-  dim3 threads(block_size, block_size);
+  dim3 threads(block_size / 2, block_size / 2); // Half the threads since each handles 4 elements
 
-  // Grid configuration dependent on the number of results per thread
-  dim3 grid((dimsB.x + block_size * RESULTS_PER_THREAD - 1) / (block_size * RESULTS_PER_THREAD),
-            (dimsA.y + block_size - 1) / block_size);
+  // Grid configuration for 2x2 results per thread
+  dim3 grid(dimsB.x / (block_size), dimsA.y / (block_size));
 
   printf("Grid configuration: [%d x %d], threads/block: %d\n", grid.x, grid.y, threads.x * threads.y);
-  printf("Computing result using CUDA Kernel...\n");
+  printf("Computing result using CUDA Kernel with 2x2 pattern...\n");
 
-  // Performs warmup operation using MatrixMul CUDA kernel
+  // Performs warmup operation
   if (block_size == 16)
   {
-    MatrixMulKernel<16, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    MatrixMulKernel2x2<8><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
   else
   {
-    MatrixMulKernel<32, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+    MatrixMulKernel2x2<16><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
 
   printf("Warmup completed\n");
@@ -238,19 +228,15 @@ bool RunMatrixMultiplyTest(int block_size, float *h_A, float *h_B, float *h_C_cp
   checkCudaErrors(cudaEventRecord(start, stream));
 
   // Execute the kernel
-  int nIter = 10; // Increased for more accurate timing
-  printf("Executing %d iterations...\n", nIter);
+  printf("Executing kernel...\n");
 
-  for (int j = 0; j < nIter; j++)
+  if (block_size == 16)
   {
-    if (block_size == 16)
-    {
-      MatrixMulKernel<16, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    }
-    else
-    {
-      MatrixMulKernel<32, RESULTS_PER_THREAD><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-    }
+    MatrixMulKernel2x2<8><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+  }
+  else
+  {
+    MatrixMulKernel2x2<16><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
   }
 
   // Record the stop event
@@ -263,22 +249,22 @@ bool RunMatrixMultiplyTest(int block_size, float *h_A, float *h_B, float *h_C_cp
   checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
 
   // Compute and print the performance
-  float msecPerMatrixMul = msecTotal / nIter;
+  float msecPerMatrixMul = msecTotal;
   double flopsPerMatrixMul = 2.0 * static_cast<double>(dimsA.x) *
                              static_cast<double>(dimsA.y) *
                              static_cast<double>(dimsB.x);
   double gigaFlops =
       (flopsPerMatrixMul * 1.0e-9f) / (msecPerMatrixMul / 1000.0f);
   printf(
-      "Performance for %d results per thread = %.2f GFlop/s, Time = %.3f ms, Operations = %.0f, Threads/block = %u\n",
-      RESULTS_PER_THREAD, gigaFlops, msecPerMatrixMul, flopsPerMatrixMul, threads.x * threads.y);
+      "Performance for 2x2 pattern = %.2f GFlop/s, Time = %.3f ms, Operations = %.0f, Threads/block = %u\n",
+      gigaFlops, msecPerMatrixMul, flopsPerMatrixMul, threads.x * threads.y);
 
   // Copy result from device to host
   checkCudaErrors(
       cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost, stream));
   checkCudaErrors(cudaStreamSynchronize(stream));
 
-  printf("Checking results correctness for %d results per thread: ", RESULTS_PER_THREAD);
+  printf("Checking results correctness for 2x2 pattern: ");
   bool correct = true;
 
   // test relative error by comparing with CPU result
@@ -309,8 +295,7 @@ bool RunMatrixMultiplyTest(int block_size, float *h_A, float *h_B, float *h_C_cp
     printf("\n...and %d more errors", errorCount - MAX_ERRORS_TO_PRINT);
   }
 
-  printf("\nResult for %d results per thread = %s\n", RESULTS_PER_THREAD,
-         correct ? "CORRECT" : "INCORRECT");
+  printf("\nResult for 2x2 pattern = %s\n", correct ? "CORRECT" : "INCORRECT");
 
   // Clean up memory
   checkCudaErrors(cudaFreeHost(h_C));
@@ -362,35 +347,68 @@ int main(int argc, char **argv)
   float *h_B;
   checkCudaErrors(cudaMallocHost(&h_B, mem_size_B));
 
-  // Initialize matrices with random values
-  printf("Initializing matrices with random values...\n");
-  RandomInit(h_A, size_A);
-  RandomInit(h_B, size_B);
-
   // Calculate reference CPU result
-  printf("Calculating reference CPU result... (this may take a while)\n");
   dim3 dimsC(dimsB.x, dimsA.y, 1);
   unsigned int mem_size_C = dimsC.x * dimsC.y * sizeof(float);
   float *h_C_cpu;
   checkCudaErrors(cudaMallocHost(&h_C_cpu, mem_size_C));
 
-  // Calculate reference result on CPU
-  MatrixMulCPU(h_C_cpu, h_A, h_B, dimsA.y, dimsA.x, dimsB.x);
-  printf("CPU calculation complete.\n");
+  // Try to load matrices from files first
+  bool filesLoaded = true;
+
+  // Try to load matrix A
+  if (!LoadMatrixFromFile(MATRIX_A_FILE, h_A, size_A))
+  {
+    filesLoaded = false;
+  }
+
+  // Try to load matrix B
+  if (!LoadMatrixFromFile(MATRIX_B_FILE, h_B, size_B))
+  {
+    filesLoaded = false;
+  }
+
+  // Try to load reference result
+  if (!LoadMatrixFromFile(MATRIX_C_REF_FILE, h_C_cpu, dimsC.x * dimsC.y))
+  {
+    filesLoaded = false;
+  }
+
+  // If any file wasn't loaded successfully, generate new matrices and calculate reference
+  if (!filesLoaded)
+  {
+    printf("Files not found or incomplete - generating new random matrices...\n");
+
+    // Initialize matrices with random values
+    RandomInit(h_A, size_A);
+    RandomInit(h_B, size_B);
+
+    // Save the generated matrices
+    SaveMatrixToFile(MATRIX_A_FILE, h_A, size_A);
+    SaveMatrixToFile(MATRIX_B_FILE, h_B, size_B);
+
+    // Calculate reference CPU result
+    printf("Calculating reference CPU result... (this may take a while)\n");
+
+    // Calculate reference result on CPU
+    MatrixMulCPU(h_C_cpu, h_A, h_B, dimsA.y, dimsA.x, dimsB.x);
+    printf("CPU calculation complete.\n");
+
+    // Save reference result
+    SaveMatrixToFile(MATRIX_C_REF_FILE, h_C_cpu, dimsC.x * dimsC.y);
+  }
+  else
+  {
+    printf("All matrices loaded from files successfully.\n");
+  }
 
   checkCudaErrors(cudaProfilerStart());
 
   // Run tests for different numbers of results per thread
-  bool result1 = RunMatrixMultiplyTest<1>(block_size, h_A, h_B, h_C_cpu, dimsA, dimsB);
-  bool result2 = RunMatrixMultiplyTest<2>(block_size, h_A, h_B, h_C_cpu, dimsA, dimsB);
-  bool result4 = RunMatrixMultiplyTest<4>(block_size, h_A, h_B, h_C_cpu, dimsA, dimsB);
-  
-  // TODO: Explain why doesn't work with 8 or more results per thread
+  bool result4 = RunMatrixMultiply4ResultsTest(block_size, h_A, h_B, h_C_cpu, dimsA, dimsB);
 
   // Display summary
   printf("\n== SUMMARY ==\n");
-  printf("Test with 1 result per thread: %s\n", result1 ? "CORRECT" : "INCORRECT");
-  printf("Test with 2 results per thread: %s\n", result2 ? "CORRECT" : "INCORRECT");
   printf("Test with 4 results per thread: %s\n", result4 ? "CORRECT" : "INCORRECT");
 
   // Free host memory
@@ -401,7 +419,7 @@ int main(int argc, char **argv)
   checkCudaErrors(cudaProfilerStop());
   checkCudaErrors(cudaDeviceSynchronize());
 
-  if (result1 && result2 && result4 && result8)
+  if (result4)
     return EXIT_SUCCESS;
   else
     return EXIT_FAILURE;
