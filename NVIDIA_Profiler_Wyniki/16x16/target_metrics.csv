@@ -1,0 +1,129 @@
+"Device","Kernel","Invocations","Metric Name","Metric Description","Min","Max","Avg"
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.995431,0.995450,0.995440
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.875747%,99.885434%,99.880591%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8192000000,8192000000,8192000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",9.095806%,9.098401%,9.097104%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",4.000000,4.000000,4.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.200000,1.200000,1.200000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.991809,0.992386,0.992098
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.516871%,99.681488%,99.599179%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8192000000,8192000000,8192000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",15.396056%,15.427865%,15.411961%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",8.000000,8.000000,8.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.666667,1.666667,1.666667
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.991021,0.991554,0.991287
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.583742%,99.749653%,99.666697%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8192000000,8192000000,8192000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",16.533413%,16.584061%,16.558737%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",4.000000,4.000000,4.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.333333,1.333333,1.333333
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.666667,1.666667,1.666667
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.985323,0.987912,0.986618
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",98.051056%,98.851939%,98.451497%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8192000000,8192000000,8192000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",24.957633%,25.093704%,25.025669%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",8.000000,8.000000,8.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.124919,0.124919,0.124919
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",81.908546%,82.210350%,82.059448%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",10276044800,10276044800,10276044800
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",15.092879%,15.135955%,15.114417%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",14.571430,14.571430,14.571430
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",28.571429,28.571429,28.571429
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",4.800000,4.800000,4.800000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",9.000000,9.000000,9.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.158183,0.158192,0.158187
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",93.864565%,93.889759%,93.877162%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",10833920000,10833920000,10833920000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",0.595069%,0.595281%,0.595175%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",14.956524,14.956524,14.956524
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",27.653254,27.653254,27.653254
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.744168,0.744624,0.744396
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",95.411186%,95.449498%,95.430342%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8355840000,8355840000,8355840000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",31.735082%,31.760830%,31.747956%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",15.811765,15.811765,15.811765
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",7.990012,7.990012,7.990012
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.400000,1.400000,1.400000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.158109,0.158134,0.158121
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",94.059305%,94.110533%,94.084919%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",11304960000,11304960000,11304960000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",0.588563%,0.588608%,0.588586%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",14.638300,14.638300,14.638300
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",27.550581,27.550581,27.550581
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.510638,1.510638,1.510638
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.510638,1.510638,1.510638
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.617531,0.619062,0.618296
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",96.604887%,96.957639%,96.781263%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8192000000,8192000000,8192000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",36.074044%,36.085202%,36.079623%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",8.000000,8.000000,8.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.608042,0.608193,0.608117
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",97.735064%,97.787528%,97.761296%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8522956800,8522956800,8522956800
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",39.630155%,39.688754%,39.659455%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",15.843138,15.843138,15.843138
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",15.622678,15.622678,15.622678
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.200000,1.200000,1.200000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.489099,0.489276,0.489188
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",97.993933%,98.027337%,98.010635%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8192000000,8192000000,8192000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",44.394070%,44.462322%,44.428196%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",3.000000,3.000000,3.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",3.000000,3.000000,3.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.359870,0.360706,0.360288
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",95.715046%,95.866945%,95.790996%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8355840000,8355840000,8355840000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",37.027882%,37.097542%,37.062712%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",15.828878,15.828878,15.828878
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",22.339239,22.339239,22.339239
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.545455,1.545455,1.545455
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.545455,1.545455,1.545455
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.243778,0.243812,0.243795
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",94.619808%,94.698210%,94.659009%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8522956800,8522956800,8522956800
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",48.394844%,48.397627%,48.396235%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",15.843138,15.843138,15.843138
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",23.470735,23.470735,23.470735
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.200000,1.200000,1.200000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.245339,0.246840,0.246089
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",85.774062%,86.193587%,85.983825%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",8860467200,8860467200,8860467200
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",32.758519%,32.862708%,32.810614%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",15.692309,15.692309,15.692309
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",30.769231,30.769231,30.769231
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",3.200000,3.200000,3.200000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",5.000000,5.000000,5.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.124989,0.124990,0.124990
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",84.804079%,84.984215%,84.894147%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",11304960000,11304960000,11304960000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",0.606087%,0.608347%,0.607217%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",14.161704,14.161704,14.161704
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",26.501035,26.501035,26.501035
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.448276,2.448276,2.448276
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",4.574468,4.574468,4.574468
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.124992,0.124992,0.124992
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",84.902496%,84.908851%,84.905674%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",11796480000,11796480000,11796480000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",0.605535%,0.605657%,0.605596%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",13.866669,13.866669,13.866669
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",26.402640,26.402640,26.402640
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",3.200000,3.200000,3.200000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",5.000000,5.000000,5.000000

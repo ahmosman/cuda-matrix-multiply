@@ -1,0 +1,98 @@
+"Start","Duration","Grid X","Grid Y","Grid Z","Block X","Block Y","Block Z","Registers Per Thread","Static SMem","Dynamic SMem","Size","Throughput","SrcMemType","DstMemType","Device","Context","Stream","Name","Correlation_ID"
+s,ms,,,,,,,,KB,B,MB,GB/s,,,,,,,
+9.672495,1.578773,,,,,,,,,,9.765625,6.040604,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","14","[CUDA memcpy HtoD]",270
+9.672523,0.036192,,,,,,,,,,9.765625,263.504177,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",272
+9.674075,1.576181,,,,,,,,,,9.765625,6.050538,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","14","[CUDA memcpy HtoD]",271
+9.675717,11.236083,100,100,1,16,16,1,30,2.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","14","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",273
+9.686967,11.243443,100,100,1,16,16,1,30,2.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","14","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",276
+9.698241,1.549748,,,,,,,,,,9.765625,6.153738,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","14","[CUDA memcpy DtoH]",280
+9.720719,1.597589,,,,,,,,,,9.765625,5.969460,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","15","[CUDA memcpy HtoD]",295
+9.720736,0.036448,,,,,,,,,,9.765625,261.653401,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",297
+9.722318,1.576276,,,,,,,,,,9.765625,6.050173,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","15","[CUDA memcpy HtoD]",296
+9.723900,6.595255,50,100,1,16,16,1,32,3.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","15","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",298
+9.730505,6.555573,50,100,1,16,16,1,32,3.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","15","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",301
+9.737078,1.569268,,,,,,,,,,9.765625,6.077192,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","15","[CUDA memcpy DtoH]",305
+9.758111,1.597461,,,,,,,,,,9.765625,5.969938,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","16","[CUDA memcpy HtoD]",320
+9.758128,0.035904,,,,,,,,,,9.765625,265.617847,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",322
+9.759711,1.576117,,,,,,,,,,9.765625,6.050784,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","16","[CUDA memcpy HtoD]",321
+9.761293,6.290867,100,50,1,16,16,1,32,3.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","16","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",323
+9.767592,6.315794,100,50,1,16,16,1,32,3.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","16","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",326
+9.773925,1.571413,,,,,,,,,,9.765625,6.068897,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","16","[CUDA memcpy DtoH]",330
+9.794910,1.596949,,,,,,,,,,9.765625,5.971852,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","17","[CUDA memcpy HtoD]",345
+9.794925,0.035904,,,,,,,,,,9.765625,265.617847,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",347
+9.796508,1.576020,,,,,,,,,,9.765625,6.051156,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","17","[CUDA memcpy HtoD]",346
+9.798091,3.976820,50,50,1,16,16,1,32,4.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","17","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",348
+9.802076,3.978004,50,50,1,16,16,1,32,4.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","17","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",351
+9.806071,1.571188,,,,,,,,,,9.765625,6.069766,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","17","[CUDA memcpy DtoH]",355
+9.826958,1.597556,,,,,,,,,,9.765625,5.969583,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","18","[CUDA memcpy HtoD]",370
+9.826974,0.035584,,,,,,,,,,9.765625,268.006496,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",372
+9.828557,1.576213,,,,,,,,,,9.765625,6.050415,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","18","[CUDA memcpy HtoD]",371
+9.830140,3.193834,50,34,1,16,16,1,40,5.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","18","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",373
+9.833343,3.193322,50,34,1,16,16,1,40,5.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","18","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",376
+9.836553,1.571221,,,,,,,,,,9.765625,6.069638,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","18","[CUDA memcpy DtoH]",380
+9.857435,1.597109,,,,,,,,,,9.765625,5.971254,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","19","[CUDA memcpy HtoD]",395
+9.857451,0.035904,,,,,,,,,,9.765625,265.617847,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",397
+9.859034,1.598869,,,,,,,,,,9.765625,5.964681,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","19","[CUDA memcpy HtoD]",396
+9.860638,2.741828,50,25,1,16,16,1,48,6.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","19","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",398
+9.863389,2.742788,50,25,1,16,16,1,48,6.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","19","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",401
+9.866148,1.570293,,,,,,,,,,9.765625,6.073225,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","19","[CUDA memcpy DtoH]",405
+9.887106,1.597109,,,,,,,,,,9.765625,5.971254,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","20","[CUDA memcpy HtoD]",420
+9.887121,0.035457,,,,,,,,,,9.765625,268.966443,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",422
+9.888705,1.576149,,,,,,,,,,9.765625,6.050661,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","20","[CUDA memcpy HtoD]",421
+9.890288,2.624226,34,34,1,16,16,1,48,6.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","20","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",423
+9.892921,2.621218,34,34,1,16,16,1,48,6.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","20","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",426
+9.895558,1.571412,,,,,,,,,,9.765625,6.068901,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","20","[CUDA memcpy DtoH]",430
+9.916444,1.596917,,,,,,,,,,9.765625,5.971972,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","21","[CUDA memcpy HtoD]",445
+9.916460,0.035584,,,,,,,,,,9.765625,268.006496,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",447
+9.918042,1.576116,,,,,,,,,,9.765625,6.050788,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","21","[CUDA memcpy HtoD]",446
+9.919625,2.244542,25,25,1,16,16,1,64,8.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","21","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",448
+9.921878,2.237725,25,25,1,16,16,1,64,8.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","21","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",451
+9.924131,1.571509,,,,,,,,,,9.765625,6.068526,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","21","[CUDA memcpy DtoH]",455
+9.945104,1.596821,,,,,,,,,,9.765625,5.972331,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","22","[CUDA memcpy HtoD]",470
+9.945120,0.035520,,,,,,,,,,9.765625,268.489391,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",472
+9.946703,1.576341,,,,,,,,,,9.765625,6.049924,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","22","[CUDA memcpy HtoD]",471
+9.948285,2.748676,20,17,1,16,16,1,72,11.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","22","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",473
+9.951042,2.746948,20,17,1,16,16,1,72,11.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","22","void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)",476
+9.953806,1.571477,,,,,,,,,,9.765625,6.068650,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","22","[CUDA memcpy DtoH]",480
+9.974687,1.636726,,,,,,,,,,9.765625,5.826719,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","23","[CUDA memcpy HtoD]",495
+9.974703,0.035457,,,,,,,,,,9.765625,268.966443,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",497
+9.976325,1.575956,,,,,,,,,,9.765625,6.051402,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","23","[CUDA memcpy HtoD]",496
+9.977907,2.140220,17,17,1,16,16,1,96,12.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","23","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",498
+9.980058,2.132924,17,17,1,16,16,1,96,12.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","23","void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)",501
+9.982208,1.571445,,,,,,,,,,9.765625,6.068773,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","23","[CUDA memcpy DtoH]",505
+10.003059,1.597333,,,,,,,,,,9.765625,5.970416,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","24","[CUDA memcpy HtoD]",520
+10.003074,0.035297,,,,,,,,,,9.765625,270.185658,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",522
+10.004658,1.575796,,,,,,,,,,9.765625,6.052016,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","24","[CUDA memcpy HtoD]",521
+10.006240,3.194953,13,13,1,16,16,1,118,16.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","24","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",523
+10.009444,3.203467,13,13,1,16,16,1,118,16.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","24","void MatrixMulCUDA<int=8, int=8>(float*, float*, float*, int)",526
+10.012664,1.571508,,,,,,,,,,9.765625,6.068530,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","24","[CUDA memcpy DtoH]",530
+10.033475,1.597301,,,,,,,,,,9.765625,5.970536,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","25","[CUDA memcpy HtoD]",545
+10.033491,0.035296,,,,,,,,,,9.765625,270.193313,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",547
+10.035074,1.576372,,,,,,,,,,9.765625,6.049805,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","25","[CUDA memcpy HtoD]",546
+10.036656,8.010473,7,7,1,16,16,1,255,32.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","25","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",548
+10.044676,8.001961,7,7,1,16,16,1,255,32.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","25","void MatrixMulCUDA<int=16, int=16>(float*, float*, float*, int)",551
+10.052694,1.570868,,,,,,,,,,9.765625,6.071002,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","25","[CUDA memcpy DtoH]",555
+10.073711,1.598421,,,,,,,,,,9.765625,5.966353,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","26","[CUDA memcpy HtoD]",570
+10.073727,0.035552,,,,,,,,,,9.765625,268.247726,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",572
+10.075312,1.576468,,,,,,,,,,9.765625,6.049437,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","26","[CUDA memcpy HtoD]",571
+10.078943,171.914824,5,5,1,16,16,1,72,46.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","26","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",573
+10.250870,172.367149,5,5,1,16,16,1,72,46.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","26","void MatrixMulCUDA<int=23, int=23>(float*, float*, float*, int)",576
+10.423255,1.613941,,,,,,,,,,9.765625,5.908979,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","26","[CUDA memcpy DtoH]",580
+10.443889,1.637910,,,,,,,,,,9.765625,5.822507,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","27","[CUDA memcpy HtoD]",595
+10.443907,0.034880,,,,,,,,,,9.765625,273.415802,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",597
+10.445529,1.575892,,,,,,,,,,9.765625,6.051648,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","27","[CUDA memcpy HtoD]",596
+10.450019,183.976549,5,5,1,16,16,1,72,47.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","27","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",598
+10.634008,183.915557,5,5,1,16,16,1,72,47.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","27","void MatrixMulCUDA<int=23, int=24>(float*, float*, float*, int)",601
+10.817943,1.614517,,,,,,,,,,9.765625,5.906871,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","27","[CUDA memcpy DtoH]",605
+10.838607,1.637941,,,,,,,,,,9.765625,5.822397,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","28","[CUDA memcpy HtoD]",620
+10.838625,0.035329,,,,,,,,,,9.765625,269.940931,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",622
+10.840247,1.576276,,,,,,,,,,9.765625,6.050173,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","28","[CUDA memcpy HtoD]",621
+10.841833,177.572338,5,5,1,16,16,1,131,47.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","28","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",623
+11.019416,177.577618,5,5,1,16,16,1,131,47.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","28","void MatrixMulCUDA<int=24, int=23>(float*, float*, float*, int)",626
+11.197011,1.637109,,,,,,,,,,9.765625,5.825356,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","28","[CUDA memcpy DtoH]",630
+11.217823,1.657430,,,,,,,,,,9.765625,5.753934,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","29","[CUDA memcpy HtoD]",645
+11.217839,0.035233,,,,,,,,,,9.765625,270.676444,"Device",,"NVIDIA GeForce GTX 1080 (0)","1","7","[CUDA memset]",647
+11.219482,1.576180,,,,,,,,,,9.765625,6.050542,"Pinned","Device","NVIDIA GeForce GTX 1080 (0)","1","29","[CUDA memcpy HtoD]",646
+11.224023,186.527431,5,5,1,16,16,1,136,48.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","29","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",648
+11.410561,186.381189,5,5,1,16,16,1,136,48.000000,0,,,,,"NVIDIA GeForce GTX 1080 (0)","1","29","void MatrixMulCUDA<int=24, int=24>(float*, float*, float*, int)",651
+11.596960,1.635605,,,,,,,,,,9.765625,5.830713,"Device","Pinned","NVIDIA GeForce GTX 1080 (0)","1","29","[CUDA memcpy DtoH]",655
