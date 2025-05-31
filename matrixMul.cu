@@ -374,8 +374,11 @@ int main(int argc, char **argv)
   // This will pick the best possible CUDA capable device
   int dev = findCudaDevice(argc, (const char **)argv);
 
-  dim3 dimsA(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
-  dim3 dimsB(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
+  // dim3 dimsA(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
+  // dim3 dimsB(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
+
+  dim3 dimsA(160, 160, 1);
+  dim3 dimsB(160, 160, 1);
 
   if (dimsA.x != dimsB.y)
   {
