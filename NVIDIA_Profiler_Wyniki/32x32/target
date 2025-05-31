@@ -1,0 +1,249 @@
+[Matrix Multiply Using CUDA] - Starting...
+==415837== NVPROF is profiling process 415837, command: ./matrixMul
+GPU Device 0: "Pascal" with compute capability 6.1
+
+MatrixA(3200,3200), MatrixB(3200,3200)
+File matrixA_3200.bin not found
+File matrixB_3200.bin not found
+File matrixC_ref_3200.bin not found
+Files not found or incomplete - generating new random matrices...
+Matrix saved to matrixA_3200.bin
+Matrix saved to matrixB_3200.bin
+Calculating reference result on CPU... (this may take a while)
+CPU calculations completed.
+Matrix saved to matrixC_ref_3200.bin
+
+-------------------------------------------------
+Testing matrix multiplication with 1 results per thread (1x1)...
+-------------------------------------------------
+Grid configuration: [100 x 100], threads/block: 1024
+Computing result using CUDA Kernel...
+==415837== Some kernel(s) will be replayed on device 0 in order to collect all events/metrics.
+Replaying kernel "void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)" (done)
+Warmup completed
+Replaying kernel "void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)" (done)
+Performance for 1 results per thread = 20.15 GFlop/s, Time = 3252.463 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 1 results per threads...
+
+Result for 1 results per threads 1x1: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 2 results per thread (2x1)...
+-------------------------------------------------
+Grid configuration: [50 x 100], threads/block: 1024
+Computing result using CUDA Kernel...
+Replaying kernel "void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)" (done)
+Warmup completedal events
+Replaying kernel "void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)" (done)
+Performance for 2 results per thread = 22.67 GFlop/s, Time = 2890.663 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 2 results per threads...
+
+Result for 2 results per threads 2x1: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 2 results per thread (1x2)...
+-------------------------------------------------
+Grid configuration: [100 x 50], threads/block: 1024
+Computing result using CUDA Kernel...
+Replaying kernel "void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)" (done)
+Warmup completedal events
+Replaying kernel "void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)" (done)
+Performance for 2 results per thread = 20.78 GFlop/s, Time = 3154.050 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 2 results per threads...
+
+Result for 2 results per threads 1x2: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 4 results per thread (2x2)...
+-------------------------------------------------
+Grid configuration: [50 x 50], threads/block: 1024
+Computing result using CUDA Kernel...
+Replaying kernel "void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)" (done)
+Warmup completedal events
+Replaying kernel "void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)" (done)
+Performance for 4 results per thread = 23.39 GFlop/s, Time = 2801.632 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 4 results per threads...
+
+Result for 4 results per threads 2x2: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 6 results per thread (2x3)...
+-------------------------------------------------
+Grid configuration: [50 x 34], threads/block: 1024
+Computing result using CUDA Kernel...
+Replaying kernel "void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)" (done)
+Warmup completedal events
+Replaying kernel "void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)" (done)
+Performance for 6 results per thread = 26.73 GFlop/s, Time = 2451.474 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 6 results per threads...
+
+Result for 6 results per threads 2x3: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 8 results per thread (2x4)...
+-------------------------------------------------
+Grid configuration: [50 x 25], threads/block: 1024
+Computing result using CUDA Kernel...
+Replaying kernel "void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)" (done)
+Warmup completed
+Replaying kernel "void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)" (done)
+Performance for 8 results per thread = 27.41 GFlop/s, Time = 2390.718 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 8 results per threads...
+
+Result for 8 results per threads 2x4: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 9 results per thread (3x3)...
+-------------------------------------------------
+Grid configuration: [34 x 34], threads/block: 1024
+Computing result using CUDA Kernel...
+Replaying kernel "void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)" (done)
+Warmup completed
+Replaying kernel "void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)" (done)
+Performance for 9 results per thread = 25.82 GFlop/s, Time = 2538.163 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 9 results per threads...
+
+Result for 9 results per threads 3x3: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 16 results per thread (4x4)...
+-------------------------------------------------
+Grid configuration: [25 x 25], threads/block: 1024
+Computing result using CUDA Kernel...
+Replaying kernel "void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)" (done)
+Warmup completedal events
+Replaying kernel "void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)" (done)
+Performance for 16 results per thread = 27.43 GFlop/s, Time = 2389.343 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 16 results per threads...
+
+Result for 16 results per threads 4x4: PASS
+
+-------------------------------------------------
+Testing matrix multiplication with 30 results per thread (5x6)...
+-------------------------------------------------
+Replaying kernel "void MatrixMulCUDA<int=5, int=6>(float*, float*, float*, int)" (done)
+Performance for 30 results per thread = 33816.58 GFlop/s, Time = 1.938 ms, Operations = 65536000000, Threads/block = 1024
+Checking results correctness for 30 results per threads...
+
+Error! Matrix[00000]=0.00000000, CPU Result=197724432.00000000, relative diff > 1.000000E-04
+Error! Matrix[00001]=0.00000000, CPU Result=200891408.00000000, relative diff > 1.000000E-04
+Error! Matrix[00002]=0.00000000, CPU Result=201543072.00000000, relative diff > 1.000000E-04
+Error! Matrix[00003]=0.00000000, CPU Result=202665776.00000000, relative diff > 1.000000E-04
+Error! Matrix[00004]=0.00000000, CPU Result=200317744.00000000, relative diff > 1.000000E-04
+Error! Matrix[00005]=0.00000000, CPU Result=200804528.00000000, relative diff > 1.000000E-04
+Error! Matrix[00006]=0.00000000, CPU Result=203680112.00000000, relative diff > 1.000000E-04
+Error! Matrix[00007]=0.00000000, CPU Result=205098128.00000000, relative diff > 1.000000E-04
+Error! Matrix[00008]=0.00000000, CPU Result=199963856.00000000, relative diff > 1.000000E-04
+Error! Matrix[00009]=0.00000000, CPU Result=204253104.00000000, relative diff > 1.000000E-04
+...and 10239990 more errors
+Result for 30 results per threads 5x6: FAIL
+
+-------------------------------------------------
+Testing matrix multiplication with 36 results per thread (6x6)...
+-------------------------------------------------
+Grid configuration: [17 x 17], threads/block: 1024
+Replaying kernel "void MatrixMulCUDA<int=6, int=6>(float*, float*, float*, int)" (done)
+Checking results correctness for 36 results per threads...Time = 1.833 ms, Operations = 65536000000, Threads/block = 1024
+
+Error! Matrix[00000]=0.00000000, CPU Result=197724432.00000000, relative diff > 1.000000E-04
+Error! Matrix[00001]=0.00000000, CPU Result=200891408.00000000, relative diff > 1.000000E-04
+Error! Matrix[00002]=0.00000000, CPU Result=201543072.00000000, relative diff > 1.000000E-04
+Error! Matrix[00003]=0.00000000, CPU Result=202665776.00000000, relative diff > 1.000000E-04
+Error! Matrix[00004]=0.00000000, CPU Result=200317744.00000000, relative diff > 1.000000E-04
+Error! Matrix[00005]=0.00000000, CPU Result=200804528.00000000, relative diff > 1.000000E-04
+Error! Matrix[00006]=0.00000000, CPU Result=203680112.00000000, relative diff > 1.000000E-04
+Error! Matrix[00007]=0.00000000, CPU Result=205098128.00000000, relative diff > 1.000000E-04
+Error! Matrix[00008]=0.00000000, CPU Result=199963856.00000000, relative diff > 1.000000E-04
+Error! Matrix[00009]=0.00000000, CPU Result=204253104.00000000, relative diff > 1.000000E-04
+...and 10239990 more errors
+Result for 36 results per threads 6x6: FAIL
+
+== SUMMARY ==
+ 1x1 results per thread: PASS
+==415837== Profiling application: ./matrixMul
+==415837== Profiling result:
+==415837== Event result:
+"Device","Kernel","Invocations","Event Name","Min","Max","Avg","Total"
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_st_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_st_bank_conflict",32000000,32000000,32000000,64000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_st_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_st_bank_conflict",16000000,16000000,16000000,32000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_st_bank_conflict",10880000,10880000,10880000,21760000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_st_bank_conflict",8000000,8000000,8000000,16000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_st_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_st_bank_conflict",24000000,24000000,24000000,48000000
+
+==415837== Metric result:
+"Device","Kernel","Invocations","Metric Name","Metric Description","Min","Max","Avg"
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.998743,0.998758,0.998750
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.876225%,99.890350%,99.883288%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",65536000000,65536000000,65536000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",13.083710%,13.093352%,13.088531%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",4.000000,4.000000,4.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.200000,1.200000,1.200000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.998502,0.998577,0.998540
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.708647%,99.741452%,99.725049%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",65536000000,65536000000,65536000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",16.736780%,16.738518%,16.737649%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",8.000000,8.000000,8.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.666667,1.666667,1.666667
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.998353,0.998565,0.998459
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.690249%,99.762611%,99.726430%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",65536000000,65536000000,65536000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",20.343219%,20.371146%,20.357182%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",4.000000,4.000000,4.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.333333,1.333333,1.333333
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.999094,0.999134,0.999114
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.207028%,99.274794%,99.240911%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",65536000000,65536000000,65536000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",25.921537%,25.953125%,25.937331%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",8.000000,8.000000,8.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.500000,1.500000,1.500000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.499654,0.499659,0.499657
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.951932%,99.952783%,99.952358%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",66846720000,66846720000,66846720000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",27.707721%,27.770145%,27.738933%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",15.811765,15.811765,15.811765
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",8.000000,8.000000,8.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.400000,1.400000,1.400000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.400000,1.400000,1.400000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.499665,0.499670,0.499668
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.170934%,99.179006%,99.174970%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",65536000000,65536000000,65536000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",32.411210%,32.411767%,32.411488%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",8.000000,8.000000,8.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",2.000000,2.000000,2.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.333333,1.333333,1.333333
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.499356,0.499358,0.499357
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",99.601865%,99.602126%,99.601996%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",68183654400,68183654400,68183654400
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",27.762730%,27.763904%,27.763317%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",15.725490,15.725490,15.725490
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",15.647059,15.647059,15.647059
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",1.000000,1.000000,1.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"achieved_occupancy","Achieved Occupancy",0.499224,0.499261,0.499242
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"sm_efficiency","Multiprocessor Activity",97.646542%,97.652045%,97.649293%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"flop_count_sp","Floating Point Operations(Single Precision)",65536000000,65536000000,65536000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"flop_sp_efficiency","FLOP Efficiency(Peak Single)",39.260588%,39.310809%,39.285698%
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"gld_transactions_per_request","Global Load Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"gst_transactions_per_request","Global Store Transactions Per Request",16.000000,16.000000,16.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_load_transactions_per_request","Shared Memory Load Transactions Per Request",3.000000,3.000000,3.000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_store_transactions_per_request","Shared Memory Store Transactions Per Request",2.500000,2.500000,2.500000

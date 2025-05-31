@@ -1,0 +1,17 @@
+"Device","Kernel","Invocations","Event Name","Min","Max","Avg","Total"
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=1>(float*, float*, float*, int)",2,"shared_st_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=1>(float*, float*, float*, int)",2,"shared_st_bank_conflict",32000000,32000000,32000000,64000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=1, int=2>(float*, float*, float*, int)",2,"shared_st_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=2>(float*, float*, float*, int)",2,"shared_st_bank_conflict",16000000,16000000,16000000,32000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=3>(float*, float*, float*, int)",2,"shared_st_bank_conflict",10880000,10880000,10880000,21760000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=2, int=4>(float*, float*, float*, int)",2,"shared_st_bank_conflict",8000000,8000000,8000000,16000000
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=3, int=3>(float*, float*, float*, int)",2,"shared_st_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_ld_bank_conflict",0,0,0,0
+"NVIDIA GeForce GTX 1080 (0)","void MatrixMulCUDA<int=4, int=4>(float*, float*, float*, int)",2,"shared_st_bank_conflict",24000000,24000000,24000000,48000000
