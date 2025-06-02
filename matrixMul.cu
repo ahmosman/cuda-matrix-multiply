@@ -16,7 +16,7 @@
 #include <helper_cuda.h>
 
 #define BLOCK_SIZE 16
-#define MATRIX_SIZE 4096
+// #define MATRIX_SIZE 4096
 
 template <int RESULTS_PER_THREAD_X = 1, int RESULTS_PER_THREAD_Y = 1>
 __global__ void MatrixMulCUDA(float *A, float *B, float *C, int size)
@@ -375,8 +375,8 @@ int main(int argc, char **argv)
   // This will pick the best possible CUDA capable device
   int dev = findCudaDevice(argc, (const char **)argv);
 
-  dim3 dimsA(MATRIX_SIZE, MATRIX_SIZE, 1);
-  dim3 dimsB(MATRIX_SIZE, MATRIX_SIZE, 1);
+  dim3 dimsA(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
+  dim3 dimsB(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
 
   if (dimsA.x != dimsB.y)
   {
@@ -446,7 +446,7 @@ int main(int argc, char **argv)
   printf(" 6x6 results per thread: %s\n", result_6x6 ? "PASS" : "FAIL");
 
 
-  if (BLOCK_SIZE == 16)
+  // if (BLOCK_SIZE == 16)
   {
     printf("8x8 results per thread: %s\n", result_8x8 ? "PASS" : "FAIL");
     printf("16x16 results per thread: %s\n", result_16x16 ? "PASS" : "FAIL");
