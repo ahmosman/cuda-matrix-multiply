@@ -15,8 +15,8 @@
 #include <helper_functions.h>
 #include <helper_cuda.h>
 
-#define BLOCK_SIZE 16
-#define MATRIX_SIZE 4096
+#define BLOCK_SIZE 32
+// #define MATRIX_SIZE 4096
 
 template <int RESULTS_PER_THREAD_X = 1, int RESULTS_PER_THREAD_Y = 1>
 __global__ void MatrixMulCUDA(float *A, float *B, float *C, int size)
@@ -375,8 +375,8 @@ int main(int argc, char **argv)
   // This will pick the best possible CUDA capable device
   int dev = findCudaDevice(argc, (const char **)argv);
 
-  dim3 dimsA(MATRIX_SIZE, MATRIX_SIZE, 1);
-  dim3 dimsB(MATRIX_SIZE, MATRIX_SIZE, 1);
+  dim3 dimsA(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
+  dim3 dimsB(50 * 2 * BLOCK_SIZE, 50 * 2 * BLOCK_SIZE, 1);
 
   if (dimsA.x != dimsB.y)
   {
@@ -419,20 +419,20 @@ int main(int argc, char **argv)
   bool result_5x6 = RunMatrixMultiplyTest<5, 6>(h_A, h_B, h_C_cpu, dimsA, dimsB);
   bool result_6x6 = RunMatrixMultiplyTest<6, 6>(h_A, h_B, h_C_cpu, dimsA, dimsB);
 
-  bool result_8x8;
-  bool result_16x16;
-  bool result_23x24;
-  bool result_24x24;
+  // bool result_8x8;
+  // bool result_16x16;
+  // bool result_23x24;
+  // bool result_24x24;
 
   // for 16x16 block size, we can also test these configurations:
-  if (BLOCK_SIZE == 16)
-  {
+  // if (BLOCK_SIZE == 16)
+  // {
 
-    result_8x8 = RunMatrixMultiplyTest<8, 8>(h_A, h_B, h_C_cpu, dimsA, dimsB);
-    result_16x16 = RunMatrixMultiplyTest<16, 16>(h_A, h_B, h_C_cpu, dimsA, dimsB);
-    result_23x24 = RunMatrixMultiplyTest<23, 24>(h_A, h_B, h_C_cpu, dimsA, dimsB);
-    result_24x24 = RunMatrixMultiplyTest<24, 24>(h_A, h_B, h_C_cpu, dimsA, dimsB);
-  }
+  //   result_8x8 = RunMatrixMultiplyTest<8, 8>(h_A, h_B, h_C_cpu, dimsA, dimsB);
+  //   result_16x16 = RunMatrixMultiplyTest<16, 16>(h_A, h_B, h_C_cpu, dimsA, dimsB);
+  //   result_23x24 = RunMatrixMultiplyTest<23, 24>(h_A, h_B, h_C_cpu, dimsA, dimsB);
+  //   result_24x24 = RunMatrixMultiplyTest<24, 24>(h_A, h_B, h_C_cpu, dimsA, dimsB);
+  // }
 
   // Display summary
   printf("\n== SUMMARY ==\n");
@@ -446,13 +446,13 @@ int main(int argc, char **argv)
   printf(" 6x6 results per thread: %s\n", result_6x6 ? "PASS" : "FAIL");
 
 
-  if (BLOCK_SIZE == 16)
-  {
-    printf("8x8 results per thread: %s\n", result_8x8 ? "PASS" : "FAIL");
-    printf("16x16 results per thread: %s\n", result_16x16 ? "PASS" : "FAIL");
-    printf("23x24 results per thread: %s\n", result_23x24 ? "PASS" : "FAIL");
-    printf("24x24 results per thread: %s\n", result_24x24 ? "PASS" : "FAIL");
-  }
+  // if (BLOCK_SIZE == 16)
+  // {
+  //   printf("8x8 results per thread: %s\n", result_8x8 ? "PASS" : "FAIL");
+  //   printf("16x16 results per thread: %s\n", result_16x16 ? "PASS" : "FAIL");
+  //   printf("23x24 results per thread: %s\n", result_23x24 ? "PASS" : "FAIL");
+  //   printf("24x24 results per thread: %s\n", result_24x24 ? "PASS" : "FAIL");
+  // }
 
   // Free host memory
   checkCudaErrors(cudaFreeHost(h_A));
