@@ -65,8 +65,7 @@ NVIDIA GeForce GTX 1080
 For detailed GPU specifications, see [file](config_gpu_GeForce%20GTX%201080.txt).
 
 ## Research papers
-
-Our research paper in Polish is available here
+Our research paper in Polish is available [here](docs/report_cuda_matrix_multiply_may_2025.pdf).
 
 ## License
 
